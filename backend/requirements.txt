@@ -1,0 +1,18 @@
+Django==5.1.4
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.6.0
+channels==4.2.0
+channels-redis==4.2.1
+daphne==4.1.2
+celery==5.4.0
+redis==5.2.1
+psycopg[binary]==3.2.3
+Pillow==11.0.0
+python-dotenv==1.0.1
+# Pose detection pipeline
+mediapipe==0.10.35
+opencv-python-headless==4.13.0.92
+imageio==2.37.3
+imageio-ffmpeg==0.6.0
+numpy==2.4.6

@@ -1,0 +1,35 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+.venv/
+venv/
+env/
+*.log
+backend/media/
+backend/staticfiles/
+.env
+*.env
+!*.env.example
+
+# Node / Expo / React Native
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+.metro-health-check*
+npm-debug.*
+yarn-error.*
+
+# Native build artifacts
+android/
+ios/
+!app/**/android/
+!app/**/ios/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

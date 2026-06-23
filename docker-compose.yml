@@ -1,0 +1,23 @@
+# Optional infra for local dev. SQLite + in-memory channels work without this,
+# but for the full stack (Postgres + Redis for Channels/Celery) run:
+#   docker compose up -d
+# then set DB_ENGINE=postgres and USE_REDIS_CHANNELS=true in backend/.env
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: smartkineto
+      POSTGRES_USER: smartkineto
+      POSTGRES_PASSWORD: smartkineto
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
