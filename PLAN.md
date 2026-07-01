@@ -1,4 +1,4 @@
-# SmartKinetoFit — Project Plan & Technical Specification
+  # SmartKinetoFit — Project Plan & Technical Specification
 
 > Status: **Draft for discussion**. No application code yet — this document defines the
 > architecture, data model, protocols, and roadmap so we can agree before building.
