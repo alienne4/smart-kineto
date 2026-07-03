@@ -1,6 +1,7 @@
 import {
   Activity,
   AlertTriangle,
+  ArrowRight,
   Bell,
   BellOff,
   Brain,
@@ -52,6 +53,7 @@ const ICONS: Record<string, LucideIcon> = {
   alert: AlertTriangle,
   empty: Inbox,
   search: Search,
+  "arrow-right": ArrowRight,
   // body-part / difficulty semantic names
   activity: Activity,
   dumbbell: Dumbbell,
@@ -148,14 +150,15 @@ export function SLabel({ n, label, right }: { n: string; label: string; right?: 
   );
 }
 
-/** Scrolling marquee status strip. */
-export function Ticker({ items }: { items: string[] }) {
+/** Scrolling marquee status strip. Renders 3 copies so wide viewports stay fully covered mid-loop. */
+export function Ticker({ items, bg = "var(--primary)", fg = "var(--bg)" }: { items: string[]; bg?: string; fg?: string }) {
   const text = items.join("   ◆   ");
   return (
-    <div className="ticker">
+    <div className="ticker" style={{ background: bg }}>
       <div className="ticker-track">
-        <span>{text}</span>
-        <span>{text}</span>
+        <span style={{ color: fg }}>{text}</span>
+        <span style={{ color: fg }}>{text}</span>
+        <span style={{ color: fg }}>{text}</span>
       </div>
     </div>
   );
