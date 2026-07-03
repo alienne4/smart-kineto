@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { api } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
-import { Avatar } from "./ui";
+import { Avatar, IconMark } from "./ui";
 
 interface NavItem {
   to: string;
@@ -13,49 +13,52 @@ interface NavItem {
 }
 
 const TRAINER_NAV: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: "🏠", end: true },
-  { to: "/exercises", label: "Exercises", icon: "🏋️" },
-  { to: "/programs", label: "Programs", icon: "📋" },
-  { to: "/patients", label: "Patients", icon: "👥" },
-  { to: "/messages", label: "Messages", icon: "💬" },
+  { to: "/", label: "Dashboard", icon: "home", end: true },
+  { to: "/exercises", label: "Exercises", icon: "exercises" },
+  { to: "/programs", label: "Programs", icon: "programs" },
+  { to: "/patients", label: "Patients", icon: "patients" },
+  { to: "/messages", label: "Messages", icon: "messages" },
 ];
 
 const PATIENT_NAV: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: "🏠", end: true },
-  { to: "/programs", label: "My Programs", icon: "🏃" },
-  { to: "/assistant", label: "AI Assistant", icon: "🤖" },
-  { to: "/progress", label: "Progress", icon: "📈" },
-  { to: "/messages", label: "Messages", icon: "💬" },
-  { to: "/profile", label: "Profile", icon: "👤" },
+  { to: "/", label: "Dashboard", icon: "home", end: true },
+  { to: "/programs", label: "My Programs", icon: "programs" },
+  { to: "/assistant", label: "AI Assistant", icon: "assistant" },
+  { to: "/progress", label: "Progress", icon: "progress" },
+  { to: "/messages", label: "Messages", icon: "messages" },
+  { to: "/profile", label: "Profile", icon: "profile" },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/admin", label: "Admin Home", icon: "📊", end: true },
-  { to: "/admin/review", label: "Review Queue", icon: "✅" },
-  { to: "/admin/announcements", label: "News & Events", icon: "📰" },
-  { to: "/admin/users", label: "Users", icon: "🗂️" },
+  { to: "/admin", label: "Admin Home", icon: "admin", end: true },
+  { to: "/admin/review", label: "Review Queue", icon: "review" },
+  { to: "/admin/announcements", label: "News & Events", icon: "news" },
+  { to: "/admin/users", label: "Users", icon: "patients" },
 ];
 
 function NotificationBell() {
   const [unread, setUnread] = useState(0);
   const navigate = useNavigate();
+
   useEffect(() => {
     let active = true;
     const load = () =>
       api
         .listNotifications()
-        .then((l) => active && setUnread(l.filter((n) => !n.read_at).length))
+        .then((items) => active && setUnread(items.filter((item) => !item.read_at).length))
         .catch(() => {});
     load();
-    const id = setInterval(load, 15000);
+    const id = window.setInterval(load, 15000);
     return () => {
       active = false;
-      clearInterval(id);
+      window.clearInterval(id);
     };
   }, []);
+
   return (
-    <button className="bell" onClick={() => navigate("/notifications")} title="Notifications">
-      🔔{unread > 0 && <span className="count">{unread > 9 ? "9+" : unread}</span>}
+    <button className="bell" onClick={() => navigate("/notifications")} title="Notifications" aria-label="Notifications">
+      <IconMark name="bell" />
+      {unread > 0 && <span className="count">{unread > 9 ? "9+" : unread}</span>}
     </button>
   );
 }
@@ -72,29 +75,35 @@ export default function Layout() {
           <div className="logo">SK</div>
           <h1>SmartKineto</h1>
         </div>
-        {baseNav.map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.end} className="nav-link">
-            <span className="ico">{n.icon}</span>
-            <span className="label">{n.label}</span>
+        {baseNav.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
+            <span className="ico">
+              <IconMark name={item.icon} />
+            </span>
+            <span className="label">{item.label}</span>
           </NavLink>
         ))}
         {isAdmin && (
           <>
-            <div className="faint" style={{ padding: "16px 13px 6px", letterSpacing: 1 }}>ADMIN</div>
-            {ADMIN_NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} end={n.end} className="nav-link">
-                <span className="ico">{n.icon}</span>
-                <span className="label">{n.label}</span>
+            <div className="faint nav-section">ADMIN</div>
+            {ADMIN_NAV.map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
+                <span className="ico">
+                  <IconMark name={item.icon} />
+                </span>
+                <span className="label">{item.label}</span>
               </NavLink>
             ))}
           </>
         )}
         <div className="nav-spacer" />
         <div className="sidebar-foot">
-          <div className="nav-link" onClick={logout} style={{ cursor: "pointer" }}>
-            <span className="ico">🚪</span>
+          <button className="nav-link nav-button" onClick={logout}>
+            <span className="ico">
+              <IconMark name="logout" />
+            </span>
             <span className="label">Log out</span>
-          </div>
+          </button>
         </div>
       </aside>
 
@@ -103,7 +112,7 @@ export default function Layout() {
           <h2>{greeting(user?.full_name)}</h2>
           <div className="topbar-actions">
             <NotificationBell />
-            <Avatar name={user?.full_name} size={38} />
+            <Avatar name={user?.full_name || user?.email} size={38} />
           </div>
         </header>
         <div className="content">
@@ -115,7 +124,7 @@ export default function Layout() {
 }
 
 function greeting(name?: string) {
-  const h = new Date().getHours();
-  const g = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-  return name ? `${g}, ${name.split(" ")[0]}` : g;
+  const hour = new Date().getHours();
+  const label = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  return name ? `${label}, ${name.split(" ")[0]}` : label;
 }

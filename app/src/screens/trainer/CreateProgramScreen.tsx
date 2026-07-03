@@ -1,10 +1,10 @@
 import React, { useLayoutEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, TrainingProgram } from "../../api/client";
-import { Badge, Card, EmptyState, Field, IconTile, Ionicons, Loading, PrimaryButton } from "../../components/ui";
+import { EmptyState, Field, Icon, IconTile, Loading, PrimaryButton, SLabel } from "../../components/ui";
 import { useApi } from "../../hooks/useApi";
-import { BODY_PART_META, colors, spacing, type as T } from "../../theme";
+import { BODY_PART_META, body, colors, mono, spacing } from "../../theme";
 
 export default function CreateProgramScreen({ navigation, route }: any) {
   const editing: TrainingProgram | undefined = route?.params?.program;
@@ -51,9 +51,9 @@ export default function CreateProgramScreen({ navigation, route }: any) {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Field label="PROGRAM NAME" value={name} onChangeText={setName} placeholder="Knee rehab — week 1" />
+      <Field label="Program name" value={name} onChangeText={setName} placeholder="Knee rehab — week 1" />
       <Field
-        label="DESCRIPTION"
+        label="Description"
         value={description}
         onChangeText={setDescription}
         placeholder="Goals, frequency…"
@@ -61,29 +61,37 @@ export default function CreateProgramScreen({ navigation, route }: any) {
         style={{ minHeight: 70, textAlignVertical: "top" }}
       />
 
-      <Text style={styles.label}>EXERCISES · {selected.length} selected</Text>
+      <View style={styles.sectionHead}>
+        <SLabel n="01" label="Exercises" right={`${selected.length} selected`} />
+      </View>
       {loading && <Loading />}
       {!loading && exercises?.length === 0 && (
         <EmptyState icon="barbell-outline" title="No exercises yet" subtitle="Create exercises first, then build a program." />
       )}
-      {exercises?.map((ex) => {
-        const on = selected.includes(ex.id);
-        const meta = BODY_PART_META[ex.body_part] || BODY_PART_META.OTHER;
-        return (
-          <Card key={ex.id} onPress={() => toggle(ex.id)} style={[styles.row, on && { borderColor: colors.primary }]}>
-            {ex.thumbnail ? (
-              <Image source={{ uri: ex.thumbnail }} style={styles.thumb} />
-            ) : (
-              <IconTile icon={meta.icon as any} grad={meta.grad} size={40} />
-            )}
-            <View style={{ flex: 1 }}>
-              <Text style={T.body}>{ex.title}</Text>
-              <Text style={T.muted}>{meta.label} · by {ex.author}</Text>
-            </View>
-            <Ionicons name={on ? "checkmark-circle" : "add-circle-outline"} size={26} color={on ? colors.primary : colors.textFaint} />
-          </Card>
-        );
-      })}
+      {exercises && exercises.length > 0 && (
+        <View style={styles.list}>
+          {exercises.map((ex, i) => {
+            const on = selected.includes(ex.id);
+            const meta = BODY_PART_META[ex.body_part] || BODY_PART_META.OTHER;
+            return (
+              <Pressable
+                key={ex.id}
+                onPress={() => toggle(ex.id)}
+                style={[styles.row, i < exercises.length - 1 && styles.rowDivider, on && styles.rowActive]}
+              >
+                {ex.thumbnail ? <Image source={{ uri: ex.thumbnail }} style={styles.thumb} /> : <IconTile icon={meta.icon as any} size={40} />}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.name}>{ex.title}</Text>
+                  <Text style={styles.meta}>
+                    {meta.label} · by {ex.author}
+                  </Text>
+                </View>
+                <Icon name={on ? "checkmark-circle" : "add-circle-outline"} size={22} color={on ? colors.primary : colors.textFaint} />
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <View style={{ height: spacing(3) }} />
@@ -95,8 +103,13 @@ export default function CreateProgramScreen({ navigation, route }: any) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5) },
-  label: { ...T.label, marginVertical: spacing(1) },
-  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.25), marginBottom: spacing(1.25) },
-  thumb: { width: 40, height: 40, borderRadius: 10, backgroundColor: colors.surfaceHi },
-  error: { color: colors.danger, marginTop: spacing(2) },
+  sectionHead: { marginTop: spacing(1), marginBottom: spacing(1.5) },
+  list: { borderWidth: 1, borderColor: colors.border },
+  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.25), padding: spacing(1.5), borderLeftWidth: 2, borderLeftColor: "transparent" },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  rowActive: { backgroundColor: `${colors.primary}10`, borderLeftColor: colors.primary },
+  thumb: { width: 40, height: 40, backgroundColor: colors.surfaceHi },
+  name: body(13, colors.text, "semibold"),
+  meta: mono(9, colors.textMuted, "medium", { marginTop: 2 }),
+  error: { ...body(13, colors.danger, "medium"), marginTop: spacing(2) },
 });

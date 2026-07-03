@@ -200,3 +200,234 @@ input, textarea, select { font-family: inherit; }
 .scale { display: flex; flex-wrap: wrap; gap: 6px; }
 .scale button { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-weight: 700; }
 .scale button.on { color: var(--text); }
+
+/* Figma Make visual pass */
+body {
+  background: radial-gradient(circle at 20% -20%, rgba(34, 211, 238, 0.12), transparent 35%), var(--bg);
+}
+
+.sidebar {
+  width: 256px;
+  background: rgba(15, 23, 42, 0.96);
+}
+
+.brand h1,
+.hero h1,
+.stat .val {
+  letter-spacing: 0;
+}
+
+.nav-link {
+  font-weight: 700;
+}
+
+.nav-link .ico {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.nav-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.nav-section {
+  padding: 16px 13px 6px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.topbar {
+  background: rgba(11,17,32,0.86);
+  backdrop-filter: blur(10px);
+}
+
+.content {
+  max-width: 1220px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+}
+
+.hero-metrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.hero-pill {
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.card {
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+}
+
+.card.click:hover {
+  background: var(--surface-alt);
+}
+
+.grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.section-title,
+.stat .val {
+  font-weight: 900;
+}
+
+.stat {
+  min-height: 142px;
+}
+
+.tile {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.btn {
+  font-weight: 900;
+}
+
+.icon-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+.icon-mark::before {
+  content: "";
+  width: 70%;
+  height: 70%;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+}
+
+.icon-mark.sm {
+  width: 14px;
+  height: 14px;
+}
+
+.icon-mark.lg {
+  width: 52px;
+  height: 52px;
+  color: var(--primary);
+}
+
+.icon-mark[data-icon="home"]::before,
+.icon-mark[data-icon="programs"]::before,
+.icon-mark[data-icon="admin"]::before {
+  border-radius: 4px 4px 8px 8px;
+}
+
+.icon-mark[data-icon="patients"]::before,
+.icon-mark[data-icon="profile"]::before {
+  border-radius: 50%;
+  box-shadow: 10px 0 0 -5px currentColor;
+}
+
+.icon-mark[data-icon="messages"]::before {
+  border-radius: 8px;
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 65% 75%, 50% 100%, 35% 75%, 0 75%);
+}
+
+.icon-mark[data-icon="plus"]::before,
+.icon-mark[data-icon="review"]::before {
+  border: 0;
+  width: 18px;
+  height: 18px;
+  background:
+    linear-gradient(currentColor, currentColor) center / 3px 100% no-repeat,
+    linear-gradient(currentColor, currentColor) center / 100% 3px no-repeat;
+}
+
+.icon-mark[data-icon="bell"]::before,
+.icon-mark[data-icon="news"]::before,
+.icon-mark[data-icon="assistant"]::before,
+.icon-mark[data-icon="progress"]::before,
+.icon-mark[data-icon="logout"]::before,
+.icon-mark[data-icon="alert"]::before,
+.icon-mark[data-icon="exercises"]::before,
+.icon-mark[data-icon="empty"]::before {
+  border-radius: 50%;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 72px;
+  }
+
+  .brand h1,
+  .nav-link span.label {
+    display: none;
+  }
+
+  .grid.cols-3,
+  .grid.cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .brand,
+  .sidebar-foot,
+  .nav-spacer {
+    display: none;
+  }
+
+  .nav-link span.label {
+    display: inline;
+  }
+
+  .topbar {
+    padding: 0 18px;
+  }
+
+  .content {
+    padding: 18px;
+  }
+
+  .hero {
+    display: block;
+  }
+
+  .hero-metrics {
+    justify-content: flex-start;
+    margin-top: 18px;
+  }
+}

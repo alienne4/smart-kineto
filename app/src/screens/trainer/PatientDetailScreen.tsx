@@ -3,9 +3,9 @@ import React, { useCallback } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api } from "../../api/client";
-import { Avatar, BarChart, Card, EmptyState, Ionicons, Loading, Notice, PrimaryButton, SectionTitle } from "../../components/ui";
+import { Avatar, BarChart, EmptyState, Loading, Notice, PrimaryButton, SLabel, StatCard } from "../../components/ui";
 import { useApi } from "../../hooks/useApi";
-import { colors, spacing, type as T } from "../../theme";
+import { body, colors, disp, mono, spacing } from "../../theme";
 
 export default function PatientDetailScreen({ route, navigation }: any) {
   const patient = route.params.patient;
@@ -27,8 +27,8 @@ export default function PatientDetailScreen({ route, navigation }: any) {
       <View style={styles.head}>
         <Avatar name={patient.full_name || patient.email} size={56} />
         <View style={{ flex: 1 }}>
-          <Text style={T.h1}>{patient.full_name || patient.email}</Text>
-          <Text style={T.muted}>{patient.email}</Text>
+          <Text style={styles.name}>{patient.full_name || patient.email}</Text>
+          <Text style={styles.email}>{patient.email}</Text>
         </View>
       </View>
 
@@ -45,39 +45,44 @@ export default function PatientDetailScreen({ route, navigation }: any) {
 
       {latest && (
         <View style={styles.statsRow}>
-          <Card style={styles.miniStat}>
-            <Text style={[T.h1, { color: colors.danger }]}>{latest.pain_level}</Text>
-            <Text style={T.muted}>Latest pain</Text>
-          </Card>
-          <Card style={styles.miniStat}>
-            <Text style={[T.h1, { color: colors.success }]}>{latest.mobility_score}</Text>
-            <Text style={T.muted}>Latest mobility</Text>
-          </Card>
+          <StatCard label="Latest pain" value={latest.pain_level} icon="alert-circle" />
+          <StatCard label="Latest mobility" value={latest.mobility_score} icon="trending-up" />
         </View>
       )}
 
       {recent.length > 1 && (
-        <Card style={{ marginTop: spacing(2) }}>
-          <Text style={styles.chartTitle}>Pain trend</Text>
-          <BarChart data={painSeries} color={colors.danger} />
-          <Text style={[styles.chartTitle, { marginTop: spacing(2) }]}>Mobility trend</Text>
-          <BarChart data={mobilitySeries} color={colors.success} />
-        </Card>
+        <View style={{ marginTop: spacing(2.5) }}>
+          <SLabel n="01" label="Trend" right={`Last ${recent.length}`} />
+          <View style={styles.trendCard}>
+            <Text style={styles.chartLabel}>Pain</Text>
+            <BarChart data={painSeries} color={colors.danger} height={64} />
+            <Text style={[styles.chartLabel, { marginTop: spacing(1.5) }]}>Mobility</Text>
+            <BarChart data={mobilitySeries} color={colors.success} height={64} />
+          </View>
+        </View>
       )}
 
-      <SectionTitle title="Self-assessments" />
+      <View style={styles.sectionHead}>
+        <SLabel n={recent.length > 1 ? "02" : "01"} label="Self-assessments" right={data ? `${data.length}` : undefined} />
+      </View>
       {loading && <Loading />}
       {error && <Notice text={error} tone="error" />}
       {!loading && data?.length === 0 && <EmptyState icon="clipboard-outline" title="No assessments yet" />}
-      {data?.map((a) => (
-        <Card key={a.id} style={{ marginBottom: spacing(1.25) }}>
-          <View style={styles.assessRow}>
-            <Text style={T.body}>Pain {a.pain_level} · Mobility {a.mobility_score}</Text>
-            <Text style={T.muted}>{a.created_at ? new Date(a.created_at).toLocaleDateString() : ""}</Text>
-          </View>
-          {a.notes ? <Text style={[T.muted, { marginTop: spacing(0.5), color: colors.text }]}>{a.notes}</Text> : null}
-        </Card>
-      ))}
+      {data && data.length > 0 && (
+        <View style={styles.list}>
+          {data.map((a, i) => (
+            <View key={a.id} style={[styles.assessRow, i < data.length - 1 && styles.rowDivider]}>
+              <View style={styles.assessHead}>
+                <Text style={styles.assessValue}>
+                  Pain <Text style={{ color: colors.danger }}>{a.pain_level}</Text> · Mobility <Text style={{ color: colors.success }}>{a.mobility_score}</Text>
+                </Text>
+                <Text style={styles.date}>{a.created_at ? new Date(a.created_at).toLocaleDateString() : ""}</Text>
+              </View>
+              {a.notes ? <Text style={styles.notes}>{a.notes}</Text> : null}
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -85,9 +90,18 @@ export default function PatientDetailScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5) },
-  head: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(2) },
-  statsRow: { flexDirection: "row", gap: spacing(1.25), marginTop: spacing(2) },
-  miniStat: { flex: 1, alignItems: "center", gap: 4 },
-  chartTitle: { ...T.label, marginBottom: spacing(1) },
-  assessRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  head: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(2.5) },
+  name: disp(20, colors.text),
+  email: mono(10, colors.textMuted, "medium", { marginTop: 4 }),
+  statsRow: { flexDirection: "row", gap: spacing(1.25), marginTop: spacing(2.5) },
+  trendCard: { borderWidth: 1, borderColor: colors.border, padding: spacing(1.75), marginTop: spacing(1) },
+  chartLabel: mono(9, colors.textMuted, "semibold", { letterSpacing: 1 }),
+  sectionHead: { marginTop: spacing(2.5), marginBottom: spacing(1.5) },
+  list: { borderWidth: 1, borderColor: colors.border },
+  assessRow: { padding: spacing(1.75) },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  assessHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  assessValue: body(13, colors.text, "medium"),
+  date: mono(9, colors.textMuted, "medium"),
+  notes: body(12, colors.textMuted, "regular", { marginTop: 6 }),
 });

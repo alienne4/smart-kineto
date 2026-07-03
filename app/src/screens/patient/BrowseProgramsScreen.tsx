@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, Assignment, TrainingProgram } from "../../api/client";
-import { Badge, Card, EmptyState, IconTile, Loading, Notice, PrimaryButton } from "../../components/ui";
-import { colors, gradients, spacing, type as T } from "../../theme";
+import { Badge, EmptyState, IconTile, Loading, Notice, PrimaryButton, SLabel } from "../../components/ui";
+import { colors, spacing, type as T } from "../../theme";
 
 export default function BrowseProgramsScreen({ navigation }: any) {
   const [programs, setPrograms] = useState<TrainingProgram[]>([]);
@@ -40,6 +40,9 @@ export default function BrowseProgramsScreen({ navigation }: any) {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <SLabel n="01" label="Public programs" right={programs.length ? `${programs.length}` : undefined} />
+      <View style={{ height: spacing(1.5) }} />
+
       {loading && <Loading />}
       {error && <Notice text={error} tone="error" />}
       {!loading && programs.length === 0 && (
@@ -48,8 +51,8 @@ export default function BrowseProgramsScreen({ navigation }: any) {
       {programs.map((p) => {
         const has = assigned.has(p.id);
         return (
-          <Card key={p.id} style={styles.row}>
-            <IconTile icon="fitness-outline" grad={gradients.primary} size={50} />
+          <View key={p.id} style={styles.row}>
+            <IconTile icon="fitness-outline" size={50} />
             <View style={{ flex: 1 }}>
               <Text style={T.body}>{p.name}</Text>
               <Text style={T.muted} numberOfLines={1}>
@@ -68,7 +71,7 @@ export default function BrowseProgramsScreen({ navigation }: any) {
                 onPress={() => add(p)}
               />
             </View>
-          </Card>
+          </View>
         );
       })}
     </ScrollView>
@@ -78,5 +81,13 @@ export default function BrowseProgramsScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5) },
-  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(1.5) },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing(1.5),
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing(1.75),
+    marginBottom: spacing(1.5),
+  },
 });

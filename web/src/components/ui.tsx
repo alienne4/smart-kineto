@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type React from "react";
 
 import { ApiError } from "../api/client";
 
@@ -6,10 +7,10 @@ export function Spinner() {
   return <div className="spinner" />;
 }
 
-export function Empty({ icon = "📭", title, subtitle }: { icon?: string; title: string; subtitle?: string }) {
+export function Empty({ icon = "empty", title, subtitle }: { icon?: string; title: string; subtitle?: string }) {
   return (
     <div className="empty">
-      <div className="big">{icon}</div>
+      <IconMark name={icon} size="lg" />
       <div style={{ fontWeight: 700, fontSize: 16 }}>{title}</div>
       {subtitle && <div className="muted" style={{ marginTop: 6 }}>{subtitle}</div>}
     </div>
@@ -27,11 +28,12 @@ export function Badge({ text, color = "var(--primary)" }: { text: string; color?
 export function Avatar({ name, size = 44 }: { name?: string; size?: number }) {
   const initials = (name || "?")
     .split(" ")
-    .map((w) => w[0])
+    .map((word) => word[0])
     .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
   return (
     <div className="avatar" style={{ width: size, height: size, fontSize: size * 0.36 }}>
       {initials}
@@ -39,10 +41,22 @@ export function Avatar({ name, size = 44 }: { name?: string; size?: number }) {
   );
 }
 
+export function IconMark({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
+  return <span className={`icon-mark ${size}`} data-icon={name} aria-hidden="true" />;
+}
+
+export function IconTile({ icon, grad }: { icon: string; grad: string }) {
+  return (
+    <div className="tile" style={{ background: grad }}>
+      <IconMark name={icon} />
+    </div>
+  );
+}
+
 export function Stat({ label, value, icon, grad }: { label: string; value: string | number; icon: string; grad: string }) {
   return (
     <div className="card stat">
-      <div className="tile" style={{ background: grad }}>{icon}</div>
+      <IconTile icon={icon} grad={grad} />
       <div className="val">{value}</div>
       <div className="lbl">{label}</div>
     </div>
@@ -68,14 +82,14 @@ export function BarChart({ data, color, max = 10 }: { data: { label: string; val
 export function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="card modal" onClick={(e) => e.stopPropagation()}>
+      <div className="card modal" onClick={(event) => event.stopPropagation()}>
         {children}
       </div>
     </div>
   );
 }
 
-export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
+export function useApi<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,8 +99,8 @@ export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
     setError(null);
     try {
       setData(await fn());
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Something went wrong");
+    } catch (error) {
+      setError(error instanceof ApiError ? error.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -101,15 +115,15 @@ export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
 }
 
 export const BODY_PART_META: Record<string, { label: string; icon: string; grad: string }> = {
-  SHOULDER: { label: "Shoulder", icon: "💪", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
-  ELBOW: { label: "Elbow", icon: "🦾", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
-  WRIST: { label: "Wrist", icon: "✋", grad: "linear-gradient(135deg,#34d399,#059669)" },
-  HIP: { label: "Hip", icon: "🦵", grad: "linear-gradient(135deg,#fb7185,#e11d48)" },
-  KNEE: { label: "Knee", icon: "🦵", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
-  ANKLE: { label: "Ankle", icon: "🦶", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
-  BACK: { label: "Back", icon: "🧍", grad: "linear-gradient(135deg,#34d399,#059669)" },
-  NECK: { label: "Neck", icon: "🧎", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
-  OTHER: { label: "Other", icon: "⚙️", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
+  SHOULDER: { label: "Shoulder", icon: "SH", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
+  ELBOW: { label: "Elbow", icon: "EL", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
+  WRIST: { label: "Wrist", icon: "WR", grad: "linear-gradient(135deg,#34d399,#059669)" },
+  HIP: { label: "Hip", icon: "HP", grad: "linear-gradient(135deg,#fb7185,#e11d48)" },
+  KNEE: { label: "Knee", icon: "KN", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
+  ANKLE: { label: "Ankle", icon: "AN", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
+  BACK: { label: "Back", icon: "BK", grad: "linear-gradient(135deg,#34d399,#059669)" },
+  NECK: { label: "Neck", icon: "NK", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
+  OTHER: { label: "Other", icon: "OT", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
 };
 
 export const DIFFICULTY_META: Record<string, { label: string; color: string }> = {
@@ -126,15 +140,15 @@ export const ASSIGNMENT_STATUS: Record<string, { label: string; color: string }>
 };
 
 export function statusMeta(status?: string) {
-  return (status && ASSIGNMENT_STATUS[status]) || { label: status || "—", color: "var(--muted)" };
+  return (status && ASSIGNMENT_STATUS[status]) || { label: status || "-", color: "var(--muted)" };
 }
 
 export function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
   return new Date(iso).toLocaleDateString();
 }

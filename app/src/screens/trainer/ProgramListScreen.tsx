@@ -4,10 +4,17 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Badge, Card, EmptyState, IconTile, Ionicons, Loading, Notice } from "../../components/ui";
+import { Badge, EmptyState, Icon, IconTile, Loading, Notice } from "../../components/ui";
 import { useApi } from "../../hooks/useApi";
-import { colors, gradients, spacing, type as T } from "../../theme";
-import { SegBtn } from "./ExerciseListScreen";
+import { body, colors, mono, spacing } from "../../theme";
+
+function SourceTab({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={[styles.tab, active && styles.tabActive]}>
+      <Text style={mono(10, active ? colors.primary : colors.textMuted, active ? "bold" : "medium")}>{label.toUpperCase()}</Text>
+    </Pressable>
+  );
+}
 
 export default function ProgramListScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -33,8 +40,8 @@ export default function ProgramListScreen({ navigation }: any) {
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.segment}>
-          <SegBtn label="My programs" active={source === "MINE"} onPress={() => setSource("MINE")} />
-          <SegBtn label="Library" active={source === "LIBRARY"} onPress={() => setSource("LIBRARY")} />
+          <SourceTab label="My programs" active={source === "MINE"} onPress={() => setSource("MINE")} />
+          <SourceTab label="Library" active={source === "LIBRARY"} onPress={() => setSource("LIBRARY")} />
         </View>
         {loading && <Loading />}
         {error && <Notice text={error} tone="error" />}
@@ -45,27 +52,41 @@ export default function ProgramListScreen({ navigation }: any) {
             subtitle={source === "LIBRARY" ? "Check back later." : "Build your own or copy one from the Library."}
           />
         )}
-        {filtered.map((p) => (
-          <Card key={p.id} style={styles.row} onPress={() => navigation.navigate("ProgramDetail", { program: p })}>
-            <IconTile icon="list-outline" grad={gradients.violet} />
-            <View style={{ flex: 1 }}>
-              <Text style={T.body} numberOfLines={1}>{p.name}</Text>
-              <Text style={styles.author}>by {p.author}</Text>
-              <Text style={T.muted} numberOfLines={2}>
-                {p.description || "No description"}
-              </Text>
-              {p.is_template ? (
-                <View style={{ marginTop: 4 }}><Badge text="LIBRARY" color={colors.accent} /></View>
-              ) : p.is_public ? (
-                <View style={{ marginTop: 4 }}><Badge text="PUBLIC" color={colors.success} /></View>
-              ) : null}
-            </View>
-            <Badge text={`${p.exercise_count}`} color={colors.primary} />
-          </Card>
-        ))}
+        {filtered.length > 0 && (
+          <View style={styles.list}>
+            {filtered.map((p, i) => (
+              <Pressable
+                key={p.id}
+                onPress={() => navigation.navigate("ProgramDetail", { program: p })}
+                style={[styles.row, i < filtered.length - 1 && styles.rowDivider]}
+              >
+                <IconTile icon="list-outline" />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.name} numberOfLines={1}>
+                    {p.name}
+                  </Text>
+                  <Text style={styles.author}>by {p.author}</Text>
+                  <Text style={styles.desc} numberOfLines={2}>
+                    {p.description || "No description"}
+                  </Text>
+                  {p.is_template ? (
+                    <View style={{ marginTop: 6 }}>
+                      <Badge text="Library" />
+                    </View>
+                  ) : p.is_public ? (
+                    <View style={{ marginTop: 6 }}>
+                      <Badge text="Public" color={colors.success} />
+                    </View>
+                  ) : null}
+                </View>
+                <Badge text={`${p.exercise_count}`} />
+              </Pressable>
+            ))}
+          </View>
+        )}
       </ScrollView>
       <Pressable style={styles.fab} onPress={() => navigation.navigate("CreateProgram")}>
-        <Ionicons name="add" size={28} color={colors.bg} />
+        <Icon name="add" size={26} color={colors.bg} />
       </Pressable>
     </View>
   );
@@ -74,23 +95,23 @@ export default function ProgramListScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5), paddingBottom: spacing(12) },
-  segment: { flexDirection: "row", gap: spacing(1), marginBottom: spacing(2) },
-  author: { ...T.muted, fontSize: 11, color: colors.primary, fontWeight: "700", marginTop: 1 },
-  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(1.5) },
+  segment: { flexDirection: "row", gap: 1, backgroundColor: colors.border, marginBottom: spacing(2) },
+  tab: { flex: 1, paddingVertical: spacing(1.25), alignItems: "center", backgroundColor: colors.bg },
+  tabActive: { backgroundColor: `${colors.primary}15`, borderBottomWidth: 2, borderBottomColor: colors.primary },
+  list: { borderWidth: 1, borderColor: colors.border },
+  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), padding: spacing(1.75) },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  name: body(14, colors.text, "semibold"),
+  author: mono(9, colors.primary, "bold", { marginTop: 2, marginBottom: 2 }),
+  desc: body(12, colors.textMuted),
   fab: {
     position: "absolute",
     right: spacing(2.5),
     bottom: spacing(3),
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
   },
 });

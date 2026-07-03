@@ -3,8 +3,8 @@ import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { api } from "../api/client";
-import { colors } from "../theme";
-import { Ionicons } from "./ui";
+import { colors, mono } from "../theme";
+import { Icon } from "./ui";
 
 export function NotificationBell({ onPress }: { onPress: () => void }) {
   const [unread, setUnread] = useState(0);
@@ -26,10 +26,10 @@ export function NotificationBell({ onPress }: { onPress: () => void }) {
 
   return (
     <Pressable onPress={onPress} style={styles.bell} hitSlop={10}>
-      <Ionicons name="notifications" size={22} color="#fff" />
+      <Icon name="notifications" size={20} color={colors.text} />
       {unread > 0 && (
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>{unread > 9 ? "9+" : unread}</Text>
+          <Text style={mono(9, colors.bg, "bold")}>{unread > 9 ? "9+" : unread}</Text>
         </View>
       )}
     </Pressable>
@@ -38,24 +38,25 @@ export function NotificationBell({ onPress }: { onPress: () => void }) {
 
 const styles = StyleSheet.create({
   bell: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    width: 40,
+    height: 40,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   badge: {
     position: "absolute",
-    top: 4,
-    right: 4,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
+    top: -5,
+    right: -5,
+    minWidth: 17,
+    height: 17,
     backgroundColor: colors.danger,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 4,
+    paddingHorizontal: 3,
+    borderWidth: 1,
+    borderColor: colors.bg,
   },
-  badgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
 });
