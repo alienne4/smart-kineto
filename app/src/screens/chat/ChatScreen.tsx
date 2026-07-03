@@ -12,8 +12,8 @@ import {
 
 import { api, ChatMessage } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Ionicons, Loading } from "../../components/ui";
-import { colors, radius, spacing, type as T } from "../../theme";
+import { Avatar, Ionicons, Loading } from "../../components/ui";
+import { colors, mono, spacing, type as T } from "../../theme";
 
 export default function ChatScreen({ route, navigation }: any) {
   const { userId, name } = route.params;
@@ -25,7 +25,15 @@ export default function ChatScreen({ route, navigation }: any) {
   const scrollRef = useRef<ScrollView>(null);
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: name || "Chat" });
+    navigation.setOptions({
+      title: name || "Chat",
+      headerTitle: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <Avatar name={name} size={30} />
+          <Text style={mono(12, colors.text, "semibold")}>{name || "Chat"}</Text>
+        </View>
+      ),
+    });
   }, [navigation, name]);
 
   async function load(initial = false) {
@@ -80,7 +88,7 @@ export default function ChatScreen({ route, navigation }: any) {
             return (
               <View key={m.id} style={[styles.bubbleRow, mine ? styles.right : styles.left]}>
                 <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs]}>
-                  <Text style={[styles.bubbleText, mine && { color: colors.bg }]}>{m.body}</Text>
+                  <Text style={[styles.bubbleText, mine && { color: colors.bg, fontWeight: "600" }]}>{m.body}</Text>
                 </View>
               </View>
             );
@@ -98,7 +106,7 @@ export default function ChatScreen({ route, navigation }: any) {
           multiline
         />
         <Pressable style={[styles.sendBtn, !text.trim() && { opacity: 0.5 }]} onPress={send} disabled={!text.trim()}>
-          <Ionicons name="send" size={18} color={colors.bg} />
+          <Ionicons name="chevron-forward" size={20} color={colors.bg} />
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -111,9 +119,9 @@ const styles = StyleSheet.create({
   bubbleRow: { flexDirection: "row" },
   left: { justifyContent: "flex-start" },
   right: { justifyContent: "flex-end" },
-  bubble: { maxWidth: "80%", paddingVertical: spacing(1.25), paddingHorizontal: spacing(1.75), borderRadius: radius.lg },
-  bubbleMine: { backgroundColor: colors.primary, borderBottomRightRadius: 4 },
-  bubbleTheirs: { backgroundColor: colors.surfaceHi, borderBottomLeftRadius: 4 },
+  bubble: { maxWidth: "80%", paddingVertical: spacing(1.25), paddingHorizontal: spacing(1.75), borderWidth: 1 },
+  bubbleMine: { backgroundColor: colors.primary, borderColor: colors.primary },
+  bubbleTheirs: { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
   bubbleText: { ...T.body, color: colors.text },
   inputBar: {
     flexDirection: "row",
@@ -127,14 +135,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     maxHeight: 120,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.lg,
     paddingHorizontal: spacing(1.75),
     paddingVertical: spacing(1.25),
     color: colors.text,
     fontSize: 15,
+    fontFamily: "Inter_400Regular",
   },
   sendBtn: {
     width: 44,

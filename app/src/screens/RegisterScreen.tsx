@@ -11,8 +11,13 @@ import {
 
 import { ApiError, Role } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
-import { Field, Ionicons, PrimaryButton } from "../components/ui";
-import { colors, radius, spacing, type as T } from "../theme";
+import { Field, PrimaryButton } from "../components/ui";
+import { body, disp, light, mono, spacing } from "../theme";
+
+const ROLES: { id: Role; label: string; desc: string }[] = [
+  { id: "PATIENT", label: "PATIENT", desc: "Follow programs & track recovery" },
+  { id: "TRAINER", label: "TRAINER / PT", desc: "Build programs & manage patients" },
+];
 
 export default function RegisterScreen() {
   const { register } = useAuth();
@@ -38,55 +43,74 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={T.h1}>Create your account</Text>
-        <Text style={[T.muted, { marginTop: spacing(0.5) }]}>Start your recovery journey today.</Text>
+        <Text style={disp(38, light.text, { marginBottom: 6 })}>
+          CREATE{"\n"}
+          <Text style={{ color: light.accentText }}>ACCOUNT</Text>
+        </Text>
+        <Text style={[body(13, light.muted), { marginBottom: spacing(2.5) }]}>Start your recovery journey today.</Text>
 
-        <View style={{ height: spacing(3) }} />
-
-        <Field label="FULL NAME" icon="person-outline" value={fullName} onChangeText={setFullName} placeholder="Jane Doe" />
-        <Field label="EMAIL" icon="mail-outline" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="you@example.com" />
-        <Field label="PASSWORD" icon="lock-closed-outline" value={password} onChangeText={setPassword} secureTextEntry placeholder="••••••••" />
-
-        <Text style={styles.roleLabel}>I AM A…</Text>
-        <View style={styles.roleRow}>
-          <RoleCard label="Patient" desc="Follow programs & track recovery" icon="walk-outline" active={role === "PATIENT"} onPress={() => setRole("PATIENT")} />
-          <RoleCard label="Trainer" desc="Build programs & manage patients" icon="fitness-outline" active={role === "TRAINER"} onPress={() => setRole("TRAINER")} />
+        <Text style={mono(9, light.muted, "semibold", { letterSpacing: 1, marginBottom: 8 })}>I AM A…</Text>
+        <View style={styles.roleList}>
+          {ROLES.map((r) => {
+            const active = role === r.id;
+            return (
+              <Pressable
+                key={r.id}
+                onPress={() => setRole(r.id)}
+                style={[
+                  styles.roleRow,
+                  { backgroundColor: active ? `${light.accent}1F` : light.bg, borderLeftColor: active ? light.accentText : "transparent" },
+                ]}
+              >
+                <View style={styles.roleHead}>
+                  <Text style={mono(11, active ? light.accentText : light.text, "bold")}>{r.label}</Text>
+                  {active && (
+                    <View style={styles.selectedBadge}>
+                      <Text style={mono(8, light.accentText, "bold")}>SELECTED</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={body(13, light.muted)}>{r.desc}</Text>
+              </Pressable>
+            );
+          })}
         </View>
+
+        <Field label="FULL NAME" icon="person-outline" value={fullName} onChangeText={setFullName} placeholder="Jane Doe" palette={light} />
+        <Field
+          label="EMAIL"
+          icon="mail-outline"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholder="you@example.com"
+          palette={light}
+        />
+        <Field
+          label="PASSWORD"
+          icon="lock-closed-outline"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder="••••••••"
+          palette={light}
+        />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <PrimaryButton title="Sign up" icon="arrow-forward-outline" onPress={onSubmit} loading={loading} />
+        <PrimaryButton title="Sign up" icon="arrow-forward-outline" onPress={onSubmit} loading={loading} palette={light} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-function RoleCard({ label, desc, icon, active, onPress }: { label: string; desc: string; icon: any; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={[styles.role, active && styles.roleActive]}>
-      <Ionicons name={icon} size={26} color={active ? colors.primary : colors.textMuted} />
-      <Text style={[styles.roleTitle, active && { color: colors.primary }]}>{label}</Text>
-      <Text style={styles.roleDesc}>{desc}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.bg },
+  flex: { flex: 1, backgroundColor: light.bg },
   container: { padding: spacing(3), paddingTop: spacing(6), flexGrow: 1 },
-  roleLabel: { ...T.label, marginBottom: spacing(1.25) },
-  roleRow: { flexDirection: "row", gap: spacing(1.5), marginBottom: spacing(3) },
-  role: {
-    flex: 1,
-    padding: spacing(2),
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    gap: 6,
-  },
-  roleActive: { borderColor: colors.primary, backgroundColor: colors.surfaceAlt },
-  roleTitle: { ...T.h2, fontSize: 16 },
-  roleDesc: { ...T.muted, fontSize: 12 },
-  error: { color: colors.danger, marginBottom: spacing(1.5) },
+  roleList: { flexDirection: "column", gap: 1, backgroundColor: light.border, marginBottom: spacing(3) },
+  roleRow: { borderLeftWidth: 2, paddingVertical: 13, paddingHorizontal: 16, gap: 3 },
+  roleHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  selectedBadge: { borderWidth: 1, borderColor: light.accentText, paddingHorizontal: 8, paddingVertical: 1 },
+  error: { color: light.danger, marginBottom: spacing(1.5) },
 });

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../../api/client";
-import { Avatar, BarChart, Badge, Empty, Spinner, statusMeta, timeAgo, useApi } from "../../components/ui";
+import { Avatar, BarChart, Badge, Empty, IconTile, Spinner, statusMeta, timeAgo, useApi } from "../../components/ui";
 
 export default function PatientDetail() {
   const { id } = useParams();
@@ -20,7 +20,7 @@ export default function PatientDetail() {
   }, [id]);
 
   if (loading || !data) return <Spinner />;
-  if (!data.patient) return <Empty icon="🤷" title="Patient not found" />;
+  if (!data.patient) return <Empty icon="empty" title="Patient not found" />;
 
   const recent = data.assessments.slice(0, 7).reverse();
   const latest = data.assessments[0];
@@ -33,7 +33,7 @@ export default function PatientDetail() {
           <h1 style={{ margin: 0, fontSize: 22 }}>{data.patient.full_name || data.patient.email}</h1>
           <div className="muted">{data.patient.email}</div>
         </div>
-        <button className="btn" onClick={() => navigate(`/messages/${data.patient!.id}`)}>💬 Message</button>
+        <button className="btn" onClick={() => navigate(`/messages/${data.patient!.id}`)}>Message</button>
       </div>
 
       {latest && (
@@ -42,12 +42,12 @@ export default function PatientDetail() {
           <div className="grid cols-2">
             <div className="card">
               <div className="muted">Pain level</div>
-              <div className="stat val" style={{ color: latest.pain_level >= 7 ? "var(--danger)" : "var(--text)" }}>{latest.pain_level}/10</div>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 900, letterSpacing: "-0.01em", lineHeight: 1, color: latest.pain_level >= 7 ? "var(--danger)" : "var(--text)" }}>{latest.pain_level}/10</div>
               <BarChart data={recent.map((a, i) => ({ label: `${i + 1}`, value: a.pain_level }))} color="var(--danger)" />
             </div>
             <div className="card">
               <div className="muted">Mobility</div>
-              <div className="stat val" style={{ color: "var(--success)" }}>{latest.mobility_score}/10</div>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 900, letterSpacing: "-0.01em", lineHeight: 1, color: "var(--success)" }}>{latest.mobility_score}/10</div>
               <BarChart data={recent.map((a, i) => ({ label: `${i + 1}`, value: a.mobility_score }))} color="var(--success)" />
             </div>
           </div>
@@ -56,12 +56,12 @@ export default function PatientDetail() {
 
       <h2 className="section-title">Assigned programs</h2>
       {data.assignments.length === 0 ? (
-        <Empty icon="📋" title="No programs assigned" subtitle="Assign a program from the Programs page." />
+        <Empty icon="programs" title="No programs assigned" subtitle="Assign a program from the Programs page." />
       ) : (
         <div className="grid">
           {data.assignments.map((a) => (
             <div key={a.id} className="card row click" onClick={() => navigate(`/programs/${a.program.id}`)}>
-              <div className="tile" style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>📋</div>
+              <IconTile icon="programs" />
               <div className="col" style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{a.program.name}</div>
                 <div className="muted">{a.program.exercise_count} exercises</div>
@@ -74,7 +74,7 @@ export default function PatientDetail() {
 
       <h2 className="section-title">Assessment history</h2>
       {data.assessments.length === 0 ? (
-        <Empty icon="📈" title="No assessments yet" />
+        <Empty icon="progress" title="No assessments yet" />
       ) : (
         <div className="grid">
           {data.assessments.map((a) => (

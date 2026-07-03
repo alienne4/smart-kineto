@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api, MEDIA_ORIGIN } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Badge, BODY_PART_META, DIFFICULTY_META, Spinner, useApi } from "../../components/ui";
+import { Badge, BODY_PART_META, DIFFICULTY_META, IconMark, Spinner, useApi } from "../../components/ui";
 
 const REVIEW_COLOR: Record<string, string> = {
   PENDING: "var(--warning)",
@@ -50,7 +50,9 @@ export default function ExerciseDetail() {
         ) : e.thumbnail ? (
           <img src={e.thumbnail} alt="" style={{ width: "100%", maxHeight: 320, objectFit: "cover" }} />
         ) : (
-          <div style={{ height: 180, background: meta.grad, display: "grid", placeItems: "center", fontSize: 56 }}>{meta.icon}</div>
+          <div style={{ height: 220, display: "grid", placeItems: "center", background: "var(--surface-alt)" }}>
+            <IconMark name={meta.icon} size="lg" />
+          </div>
         )}
         <div style={{ padding: 22 }}>
           <div className="row" style={{ gap: 8, marginBottom: 8 }}>

@@ -1,7 +1,10 @@
 # SmartKinetoFit — Backend (Django)
 
-Django + DRF API with JWT auth, role-based users (Trainer / Patient), and ASGI/Channels
-wired for future live training sessions. See the top-level `PLAN.md` for the full spec.
+Django + DRF API with JWT auth, role-based users (Trainer / Patient, plus staff-flag Admins),
+and ASGI/Channels wired via Daphne. Serves both the Expo mobile app (`../app`) and the Vite web
+app (`../web`). See the top-level `README.md` for the app inventory and how this diverges from
+the original `PLAN.md` draft (notably: no BLE/ESP32 hardware — patient movement is analysed from
+an uploaded video via the `pose` app's MediaPipe pipeline, not a physical sensor).
 
 ## Quick start (Windows, SQLite — no Docker needed)
 
@@ -38,7 +41,7 @@ Run Celery worker (when background tasks are added):
 celery -A config worker -l info -P solo   # -P solo for Windows
 ```
 
-## API (M0)
+## Auth
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
@@ -46,7 +49,7 @@ celery -A config worker -l info -P solo   # -P solo for Windows
 | POST | `/api/auth/register/` | none | create user (role: TRAINER\|PATIENT) |
 | POST | `/api/auth/login/` | none | obtain JWT access + refresh (+ user info) |
 | POST | `/api/auth/refresh/` | none | refresh access token |
-| GET  | `/api/auth/me/` | Bearer | current user |
+| GET  | `/api/auth/me/` | Bearer | current user (`is_admin` reflects `is_staff`) |
 
 Example register:
 
@@ -55,11 +58,25 @@ POST /api/auth/register/
 { "email": "pat@example.com", "full_name": "Pat", "role": "PATIENT", "password": "S3cret!pass" }
 ```
 
+Every other domain endpoint (training/exercises/programs, assessments, chat, content,
+notifications, admin, assistant, pose) is mounted under `/api/` by the app of the same name in
+`config/urls.py` — read each app's `urls.py`/`views.py` for the exact routes; there's no
+generated API doc yet.
+
 ## Project layout
 
 ```
 backend/
-  config/        settings, urls, asgi (Channels), celery, ws routing
-  accounts/      custom User + roles, profiles, JWT auth endpoints
+  config/          settings, urls, asgi (Channels), celery, ws routing
+  accounts/        custom User + roles, profiles, JWT auth endpoints
+  training/        Exercise, TrainingProgram, ProgramExercise, ProgramAssignment
+  assessments/     patient self-assessment / check-in records
+  pose/            PoseJob + MediaPipe pose-landmarker video processing pipeline
+  assistant/       rule-based chat assistant (training program recommender)
+  chat/            trainer <-> patient messaging
+  content/         Announcement (news/events)
+  notifications/   push device tokens + in-app notification feed
+  adminapi/        staff-only stats, review queue, user list, announcement admin
+  ml_models/       MediaPipe pose-landmarker model file(s) used by pose/
   requirements.txt
 ```

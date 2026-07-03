@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { api, Exercise } from "../../api/client";
-import { BODY_PART_META, Spinner } from "../../components/ui";
+import { BODY_PART_META, IconMark, Spinner } from "../../components/ui";
 
 interface Row {
   exercise: Exercise;
@@ -82,8 +82,10 @@ export default function ProgramForm() {
         </div>
 
         <div className="spread" style={{ marginBottom: 10 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)" }}>EXERCISES ({rows.length})</label>
-          <button className="btn ghost sm" onClick={() => setPicker(true)}>➕ Add exercise</button>
+          <label style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, color: "var(--muted)", letterSpacing: "0.09em" }}>
+            EXERCISES ({rows.length})
+          </label>
+          <button className="btn ghost sm" onClick={() => setPicker(true)}>Add exercise</button>
         </div>
 
         {rows.length === 0 && <div className="muted" style={{ marginBottom: 12 }}>No exercises added yet.</div>}
@@ -95,7 +97,7 @@ export default function ProgramForm() {
                 {r.exercise.thumbnail ? (
                   <img className="thumb" src={r.exercise.thumbnail} alt="" />
                 ) : (
-                  <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>
+                  <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>
                 )}
                 <div className="col" style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600 }}>{r.exercise.title}</div>
@@ -129,7 +131,7 @@ export default function ProgramForm() {
                 const added = !!rows.find((r) => r.exercise.id === e.id);
                 return (
                   <div key={e.id} className="card row" style={{ background: "var(--surface-alt)" }}>
-                    {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+                    {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
                     <div className="col" style={{ flex: 1 }}>
                       <div style={{ fontWeight: 600 }}>{e.title}</div>
                       <div className="faint">{e.author ? `by ${e.author}` : meta.label}</div>

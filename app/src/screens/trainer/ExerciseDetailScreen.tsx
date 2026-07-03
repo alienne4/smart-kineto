@@ -5,8 +5,17 @@ import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, Exercise } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Badge, EmptyState, IconTile, Ionicons, PrimaryButton } from "../../components/ui";
-import { BODY_PART_META, colors, DIFFICULTY_META, radius, spacing, type as T } from "../../theme";
+import { Badge, EmptyState, Icon, IconName, IconTile, PrimaryButton, SLabel } from "../../components/ui";
+import { BODY_PART_META, body, colors, DIFFICULTY_META, disp, mono, spacing } from "../../theme";
+
+function StatusNotice({ icon, text, color }: { icon: IconName; text: string; color: string }) {
+  return (
+    <View style={[styles.notice, { borderColor: color, backgroundColor: `${color}12` }]}>
+      <Icon name={icon} size={16} color={color} />
+      <Text style={[styles.noticeText, { color }]}>{text}</Text>
+    </View>
+  );
+}
 
 export default function ExerciseDetailScreen({ route, navigation }: any) {
   const { user } = useAuth();
@@ -80,18 +89,14 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.head}>
-        {exercise.thumbnail ? (
-          <Image source={{ uri: exercise.thumbnail }} style={styles.thumb} />
-        ) : (
-          <IconTile icon={meta.icon as any} grad={meta.grad} size={56} />
-        )}
+        {exercise.thumbnail ? <Image source={{ uri: exercise.thumbnail }} style={styles.thumb} /> : <IconTile icon={meta.icon as any} size={56} />}
         <View style={{ flex: 1 }}>
-          <Text style={T.h1}>{exercise.title}</Text>
+          <Text style={styles.title}>{exercise.title}</Text>
           <Text style={styles.author}>by {exercise.author}</Text>
           <View style={styles.badges}>
             <Badge text={meta.label} />
             <Badge text={diff.label} color={diff.color} />
-            {exercise.is_template ? <Badge text="LIBRARY" color={colors.accent} /> : null}
+            {exercise.is_template ? <Badge text="Library" /> : null}
           </View>
         </View>
       </View>
@@ -108,7 +113,9 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
 
       {exercise.description ? (
         <>
-          <Text style={styles.label}>Description</Text>
+          <View style={styles.sectionHead}>
+            <SLabel n="01" label="Description" />
+          </View>
           <Text style={styles.desc}>{exercise.description}</Text>
         </>
       ) : null}
@@ -132,9 +139,9 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
 }
 
 function PublishRow({ status, isPublic }: { status?: string; isPublic?: boolean }) {
-  if (isPublic) return <View style={styles.notice}><Ionicons name="globe-outline" size={18} color={colors.success} /><Text style={styles.noticeText}>Published in the public library</Text></View>;
-  if (status === "PENDING") return <View style={styles.notice}><Ionicons name="time-outline" size={18} color={colors.warning} /><Text style={styles.noticeText}>Pending admin review</Text></View>;
-  if (status === "REJECTED") return <View style={styles.notice}><Ionicons name="close-circle-outline" size={18} color={colors.danger} /><Text style={styles.noticeText}>Not approved — you can edit and resubmit</Text></View>;
+  if (isPublic) return <StatusNotice icon="globe-outline" text="Published in the public library" color={colors.success} />;
+  if (status === "PENDING") return <StatusNotice icon="time-outline" text="Pending admin review" color={colors.warning} />;
+  if (status === "REJECTED") return <StatusNotice icon="close-circle-outline" text="Not approved — you can edit and resubmit" color={colors.danger} />;
   return null;
 }
 
@@ -142,22 +149,13 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5) },
   head: { flexDirection: "row", gap: spacing(1.5), alignItems: "center", marginBottom: spacing(2) },
-  thumb: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: colors.surfaceHi },
-  author: { ...T.muted, marginTop: 2, color: colors.primary, fontWeight: "700" },
+  thumb: { width: 56, height: 56, backgroundColor: colors.surfaceHi },
+  title: disp(22, colors.text),
+  author: mono(9, colors.primary, "bold", { marginTop: 4 }),
   badges: { flexDirection: "row", gap: spacing(0.75), marginTop: spacing(1), flexWrap: "wrap" },
-  video: { width: "100%", aspectRatio: 16 / 9, backgroundColor: "#000", borderRadius: radius.md },
-  label: { ...T.label, marginTop: spacing(3), marginBottom: spacing(0.5) },
-  desc: { ...T.body, lineHeight: 22, color: colors.text },
-  notice: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing(1),
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing(1.5),
-    marginBottom: spacing(2),
-  },
-  noticeText: { ...T.muted, color: colors.text, flex: 1 },
+  video: { width: "100%", aspectRatio: 16 / 9, backgroundColor: "#000", borderWidth: 1, borderColor: colors.border },
+  sectionHead: { marginTop: spacing(3), marginBottom: spacing(1) },
+  desc: body(14, colors.text, "regular", { lineHeight: 21 }),
+  notice: { flexDirection: "row", alignItems: "center", gap: spacing(1), borderWidth: 1, padding: spacing(1.5), marginBottom: spacing(2) },
+  noticeText: body(13, colors.text, "medium", { flex: 1 }),
 });

@@ -1,12 +1,12 @@
 import { api } from "../api/client";
-import { Empty, Spinner, timeAgo, useApi } from "../components/ui";
+import { Empty, IconMark, Spinner, timeAgo, useApi } from "../components/ui";
 
 const META: Record<string, { icon: string; color: string }> = {
-  assignment: { icon: "📋", color: "var(--accent)" },
-  message: { icon: "💬", color: "var(--primary)" },
-  progress: { icon: "🏆", color: "var(--success)" },
-  assessment: { icon: "📈", color: "var(--danger)" },
-  reminder: { icon: "🔔", color: "var(--warning)" },
+  assignment: { icon: "review", color: "var(--accent)" },
+  message: { icon: "messages", color: "var(--primary)" },
+  progress: { icon: "progress", color: "var(--success)" },
+  assessment: { icon: "activity", color: "var(--danger)" },
+  reminder: { icon: "bell", color: "var(--warning)" },
 };
 
 export default function Notifications() {
@@ -33,7 +33,9 @@ export default function Notifications() {
             const m = META[n.type] || META.reminder;
             return (
               <div key={n.id} className="card row" style={!n.read_at ? { borderColor: "var(--primary)" } : undefined}>
-                <div className="tile" style={{ background: m.color }}>{m.icon}</div>
+                <div className="tile" style={{ color: m.color }}>
+                  <IconMark name={m.icon} />
+                </div>
                 <div className="col" style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600 }}>{n.title}</div>
                   {n.body && <div className="muted">{n.body}</div>}

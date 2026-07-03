@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api, ChatMessage, ChatThread } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
-import { Avatar, Badge, Empty, Spinner } from "../components/ui";
+import { Avatar, Badge, Empty, IconMark, SLabel, Spinner } from "../components/ui";
 
 export default function Messages() {
   const { user } = useAuth();
@@ -30,13 +30,14 @@ export default function Messages() {
       <div className="thread-list">
         {user?.role === "PATIENT" && user.trainer && (
           <button className="btn sm" onClick={() => navigate(`/messages/${user.trainer!.id}`)}>
-            💬 Message {user.trainer.full_name}
+            <IconMark name="messages" size="sm" /> Message {user.trainer.full_name}
           </button>
         )}
+        <SLabel n="01" label="Conversations" right={loadingThreads ? undefined : String(threads.length)} />
         {loadingThreads ? (
           <Spinner />
         ) : threads.length === 0 ? (
-          <Empty icon="💬" title="No conversations" subtitle={user?.role === "TRAINER" ? "Open a patient to start a chat." : "Message your trainer."} />
+          <Empty icon="messages" title="No conversations" subtitle={user?.role === "TRAINER" ? "Open a patient to start a chat." : "Message your trainer."} />
         ) : (
           threads.map((t) => (
             <div
@@ -59,7 +60,7 @@ export default function Messages() {
       {userId ? (
         <Conversation key={userId} userId={userId} name={activeName} onSent={loadThreads} meId={user!.id} />
       ) : (
-        <div className="chat-panel"><Empty icon="✉️" title="Select a conversation" /></div>
+        <div className="chat-panel"><Empty icon="messages" title="Select a conversation" /></div>
       )}
     </div>
   );

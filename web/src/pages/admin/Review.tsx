@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { api, Exercise, MEDIA_ORIGIN, TrainingProgram } from "../../api/client";
-import { Badge, BODY_PART_META, DIFFICULTY_META, Empty, Modal, Spinner, useApi } from "../../components/ui";
+import { Badge, BODY_PART_META, DIFFICULTY_META, Empty, IconMark, IconTile, Modal, Spinner, useApi } from "../../components/ui";
 
 export default function AdminReview() {
   const { data, loading, reload } = useApi(() => api.adminReviewQueue());
@@ -39,7 +39,7 @@ export default function AdminReview() {
               const meta = BODY_PART_META[e.body_part] || BODY_PART_META.OTHER;
               return (
                 <div key={e.id} className="card click row" onClick={() => setPreview({ kind: "exercise", item: e })}>
-                  {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+                  {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
                   <div className="col" style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700 }}>{e.title}</div>
                     <div className="muted truncate">{e.description}</div>
@@ -62,7 +62,7 @@ export default function AdminReview() {
           <div className="grid">
             {data.programs.map((p) => (
               <div key={p.id} className="card click row" onClick={() => setPreview({ kind: "program", item: p })}>
-                <div className="tile" style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>📋</div>
+                <IconTile icon="programs" />
                 <div className="col" style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700 }}>{p.name}</div>
                   <div className="muted">{p.exercise_count} exercises</div>
@@ -104,11 +104,11 @@ function ExercisePreview({ e, busy, onClose, onDecide }: { e: Exercise; busy: bo
   return (
     <Modal onClose={onClose}>
       {e.video ? (
-        <video src={e.video.startsWith("http") ? e.video : MEDIA_ORIGIN + e.video} controls poster={e.thumbnail || undefined} style={{ width: "100%", borderRadius: 12, background: "#000", marginBottom: 14 }} />
+        <video src={e.video.startsWith("http") ? e.video : MEDIA_ORIGIN + e.video} controls poster={e.thumbnail || undefined} style={{ width: "100%", background: "#000", marginBottom: 14 }} />
       ) : e.thumbnail ? (
-        <img src={e.thumbnail} alt="" style={{ width: "100%", borderRadius: 12, marginBottom: 14, maxHeight: 280, objectFit: "cover" }} />
+        <img src={e.thumbnail} alt="" style={{ width: "100%", marginBottom: 14, maxHeight: 280, objectFit: "cover" }} />
       ) : (
-        <div style={{ height: 150, borderRadius: 12, background: meta.grad, display: "grid", placeItems: "center", fontSize: 48, marginBottom: 14 }}>{meta.icon}</div>
+        <div className="thumb" style={{ height: 150, width: "100%", display: "grid", placeItems: "center", marginBottom: 14 }}><IconMark name={meta.icon} size="lg" /></div>
       )}
       <div className="row" style={{ gap: 8, marginBottom: 8 }}>
         <Badge text={meta.label} color="var(--primary)" />
@@ -136,7 +136,7 @@ function ProgramPreview({ p, busy, onClose, onDecide }: { p: TrainingProgram; bu
           return (
             <div key={pe.id} className="card row" style={{ background: "var(--surface-alt)" }}>
               <div className="avatar" style={{ width: 30, height: 30, background: "var(--surface-hi)" }}>{i + 1}</div>
-              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
               <div className="col" style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{pe.exercise.title}</div>
                 <div className="faint">{pe.sets} sets · {pe.reps} reps</div>

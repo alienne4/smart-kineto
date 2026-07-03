@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -6,7 +5,8 @@ import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { useAuth } from "../auth/AuthContext";
-import { colors } from "../theme";
+import { colors, fonts } from "../theme";
+import { Icon, IconName } from "../components/ui";
 
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
@@ -57,29 +57,32 @@ const navTheme = {
 
 const stackOptions = {
   headerStyle: { backgroundColor: colors.bg },
-  headerTintColor: colors.text,
+  headerTintColor: colors.textMuted,
+  headerTitleStyle: { fontFamily: fonts.monoSemiBold, fontSize: 13, letterSpacing: 1 },
   headerShadowVisible: false,
   contentStyle: { backgroundColor: colors.bg },
+  headerBackButtonDisplayMode: "minimal" as const,
 };
 
 const tabOptions = {
   headerShown: false,
   tabBarStyle: {
-    backgroundColor: colors.bgElevated,
+    backgroundColor: colors.bg,
     borderTopColor: colors.border,
-    height: 62,
-    paddingBottom: 8,
-    paddingTop: 6,
+    borderTopWidth: 1,
+    height: 68,
+    paddingBottom: 10,
+    paddingTop: 8,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabBarActiveTintColor: colors.primary,
-  tabBarInactiveTintColor: colors.textFaint,
-  tabBarLabelStyle: { fontSize: 11, fontWeight: "600" as const },
+  tabBarInactiveTintColor: colors.textMuted,
+  tabBarLabelStyle: { fontFamily: fonts.monoSemiBold, fontSize: 8, letterSpacing: 0.6, textTransform: "uppercase" as const },
 };
 
-function icon(name: keyof typeof Ionicons.glyphMap) {
-  return ({ color, size }: { color: string; size: number }) => (
-    <Ionicons name={name} color={color} size={size} />
-  );
+function icon(name: IconName) {
+  return ({ color, size }: { color: string; size: number }) => <Icon name={name} color={color} size={size - 4} />;
 }
 
 // ---------- Shared ----------
@@ -160,7 +163,7 @@ function PatientProgramsStack() {
       <Stack.Screen name="AssignedPrograms" component={AssignedProgramsScreen} options={{ title: "My programs" }} />
       <Stack.Screen name="BrowsePrograms" component={BrowseProgramsScreen} options={{ title: "Public programs" }} />
       <Stack.Screen name="ProgramDetail" component={PatientProgramDetailScreen} options={{ title: "Program" }} />
-      <Stack.Screen name="ExercisePlayer" component={ExercisePlayerScreen} options={{ title: "Exercise" }} />
+      <Stack.Screen name="ExercisePlayer" component={ExercisePlayerScreen} options={{ title: "Live Session" }} />
     </Stack.Navigator>
   );
 }

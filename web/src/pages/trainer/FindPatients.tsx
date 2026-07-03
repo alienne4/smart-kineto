@@ -33,9 +33,9 @@ export default function FindPatients() {
       {loading ? (
         <Spinner />
       ) : q.trim().length < 2 ? (
-        <Empty icon="🔍" title="Search patients" subtitle="Type at least 2 characters to search." />
+        <Empty icon="search" title="Search patients" subtitle="Type at least 2 characters to search." />
       ) : results.length === 0 ? (
-        <Empty icon="🤷" title="No matches" subtitle="No patients found for that search." />
+        <Empty icon="empty" title="No matches" subtitle="No patients found for that search." />
       ) : (
         <div className="grid" style={{ gap: 10 }}>
           {results.map((p) => (

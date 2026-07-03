@@ -11,13 +11,13 @@ export default function Patients() {
     <>
       <div className="spread">
         <h1 className="section-title" style={{ margin: 0 }}>Patients</h1>
-        <button className="btn" onClick={() => navigate("/patients/find")}>🔍 Find & add</button>
+        <button className="btn" onClick={() => navigate("/patients/find")}>Find & add</button>
       </div>
 
       {loading ? (
         <Spinner />
       ) : (data || []).length === 0 ? (
-        <Empty icon="👥" title="No patients yet" subtitle="Use “Find & add” to link patients to your roster." />
+        <Empty icon="patients" title="No patients yet" subtitle="Use “Find & add” to link patients to your roster." />
       ) : (
         <div className="grid cols-2" style={{ marginTop: 16 }}>
           {data!.map((p) => (

@@ -13,7 +13,7 @@ import {
 
 import { api, AssistantMessage, AssistantProposal } from "../../api/client";
 import { Badge, IconTile, Ionicons, Loading, PrimaryButton } from "../../components/ui";
-import { BODY_PART_META, colors, radius, spacing, type as T } from "../../theme";
+import { BODY_PART_META, colors, mono, spacing, type as T } from "../../theme";
 
 const STARTERS = [
   "My right knee hurts, about 6/10",
@@ -124,7 +124,7 @@ export default function AssistantScreen({ navigation }: any) {
               <View key={m.id}>
                 <View style={[styles.bubbleRow, mine ? styles.right : styles.left]}>
                   <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs]}>
-                    <Text style={[styles.bubbleText, mine && { color: colors.bg }]}>{m.content}</Text>
+                    <Text style={[styles.bubbleText, mine && { color: colors.bg, fontWeight: "600" }]}>{m.content}</Text>
                   </View>
                 </View>
                 {m.proposal ? (
@@ -186,7 +186,7 @@ function ProposalCard({ p, accepting, onAccept }: { p: AssistantProposal; accept
             {e.thumbnail ? (
               <Image source={{ uri: e.thumbnail }} style={styles.thumb} />
             ) : (
-              <IconTile icon={meta.icon as any} grad={meta.grad} size={42} />
+              <IconTile icon={meta.icon as any} size={42} />
             )}
             <View style={{ flex: 1 }}>
               <Text style={T.body}>{e.title}</Text>
@@ -208,30 +208,28 @@ const styles = StyleSheet.create({
   bubbleRow: { flexDirection: "row" },
   left: { justifyContent: "flex-start" },
   right: { justifyContent: "flex-end" },
-  bubble: { maxWidth: "84%", paddingVertical: spacing(1.25), paddingHorizontal: spacing(1.75), borderRadius: radius.lg },
-  bubbleMine: { backgroundColor: colors.primary, borderBottomRightRadius: 4 },
-  bubbleTheirs: { backgroundColor: colors.surfaceHi, borderBottomLeftRadius: 4 },
+  bubble: { maxWidth: "84%", paddingVertical: spacing(1.25), paddingHorizontal: spacing(1.75), borderWidth: 1 },
+  bubbleMine: { backgroundColor: colors.primary, borderColor: colors.primary },
+  bubbleTheirs: { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
   bubbleText: { ...T.body, color: colors.text },
   proposal: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
+    backgroundColor: `${colors.primary}0F`,
+    borderColor: `${colors.primary}55`,
     borderWidth: 1,
-    borderRadius: radius.lg,
     padding: spacing(2),
     marginTop: spacing(1),
   },
   exRow: { flexDirection: "row", alignItems: "center", gap: spacing(1.25), marginBottom: spacing(1) },
-  thumb: { width: 42, height: 42, borderRadius: radius.md, backgroundColor: colors.surfaceHi },
+  thumb: { width: 42, height: 42, backgroundColor: colors.surfaceHi },
   starters: { gap: spacing(1), marginTop: spacing(2) },
   chip: {
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
-    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceAlt,
     paddingHorizontal: spacing(1.75),
     paddingVertical: spacing(1.25),
   },
-  chipText: { color: colors.textMuted, fontWeight: "600" },
+  chipText: { ...mono(11, colors.textMuted, "medium") },
   inputBar: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -244,14 +242,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     maxHeight: 120,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.lg,
     paddingHorizontal: spacing(1.75),
     paddingVertical: spacing(1.25),
     color: colors.text,
     fontSize: 15,
+    fontFamily: "Inter_400Regular",
   },
   sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" },
 });

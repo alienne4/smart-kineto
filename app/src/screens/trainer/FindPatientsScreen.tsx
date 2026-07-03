@@ -3,8 +3,8 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, AuthUser } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Avatar, Badge, Card, EmptyState, Field, Ionicons, Loading, Notice, PrimaryButton } from "../../components/ui";
-import { colors, spacing, type as T } from "../../theme";
+import { Avatar, Badge, EmptyState, Field, Loading, Notice, PrimaryButton, SLabel } from "../../components/ui";
+import { body, colors, mono, spacing } from "../../theme";
 
 export default function FindPatientsScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -48,29 +48,42 @@ export default function FindPatientsScreen({ navigation }: any) {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Field icon="search-outline" placeholder="Search by name or email" value={query} onChangeText={setQuery} autoCapitalize="none" />
+
+      <View style={styles.sectionHead}>
+        <SLabel n="01" label="Results" right={loading ? undefined : `${results.length}`} />
+      </View>
+
       {loading && <Loading />}
       {error && <Notice text={error} tone="error" />}
       {!loading && results.length === 0 && <EmptyState icon="people-outline" title="No patients found" subtitle="Try a different name or email." />}
 
-      {results.map((p) => {
-        const mine = p.trainer?.id === user?.id;
-        const otherTrainer = p.trainer && !mine;
-        return (
-          <Card key={p.id} style={styles.row}>
-            <Avatar name={p.full_name || p.email} />
-            <View style={{ flex: 1 }}>
-              <Text style={T.body}>{p.full_name || p.email}</Text>
-              <Text style={T.muted}>{p.email}</Text>
-              {otherTrainer ? <View style={{ marginTop: 4 }}><Badge text="Has a trainer" color={colors.warning} /></View> : null}
-            </View>
-            {mine ? (
-              <Badge text="Yours" color={colors.success} />
-            ) : (
-              <PrimaryButton title={busy === p.id ? "…" : "Add"} icon="person-add-outline" onPress={() => add(p)} loading={busy === p.id} />
-            )}
-          </Card>
-        );
-      })}
+      {results.length > 0 && (
+        <View style={styles.list}>
+          {results.map((p, i) => {
+            const mine = p.trainer?.id === user?.id;
+            const otherTrainer = p.trainer && !mine;
+            return (
+              <View key={p.id} style={[styles.row, i < results.length - 1 && styles.rowDivider]}>
+                <Avatar name={p.full_name || p.email} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.name}>{p.full_name || p.email}</Text>
+                  <Text style={styles.email}>{p.email}</Text>
+                  {otherTrainer ? (
+                    <View style={{ marginTop: 6 }}>
+                      <Badge text="Has a trainer" color={colors.warning} />
+                    </View>
+                  ) : null}
+                </View>
+                {mine ? (
+                  <Badge text="Yours" color={colors.success} />
+                ) : (
+                  <PrimaryButton title={busy === p.id ? "…" : "Add"} icon="person-add-outline" onPress={() => add(p)} loading={busy === p.id} />
+                )}
+              </View>
+            );
+          })}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -78,5 +91,10 @@ export default function FindPatientsScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing(2.5) },
-  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(1.5) },
+  sectionHead: { marginTop: spacing(1.5), marginBottom: spacing(1.5) },
+  list: { borderWidth: 1, borderColor: colors.border },
+  row: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), padding: spacing(1.75) },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  name: body(14, colors.text, "semibold"),
+  email: mono(9, colors.textMuted, "medium", { marginTop: 3 }),
 });

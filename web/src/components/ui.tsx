@@ -1,16 +1,96 @@
+import {
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  BellOff,
+  Brain,
+  CheckCircle2,
+  ClipboardList,
+  Dumbbell,
+  Footprints,
+  Globe,
+  Hand,
+  HelpCircle,
+  Home,
+  Inbox,
+  Layers,
+  LogOut,
+  Mail,
+  MessageCircle,
+  MoreHorizontal,
+  Newspaper,
+  PartyPopper,
+  Plus,
+  Search,
+  ShieldCheck,
+  TrendingUp,
+  User,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { ApiError } from "../api/client";
+
+const ICONS: Record<string, LucideIcon> = {
+  home: Home,
+  exercises: Dumbbell,
+  programs: Layers,
+  patients: Users,
+  messages: MessageCircle,
+  assistant: Brain,
+  progress: TrendingUp,
+  profile: User,
+  admin: ShieldCheck,
+  review: ClipboardList,
+  news: Newspaper,
+  logout: LogOut,
+  bell: Bell,
+  plus: Plus,
+  alert: AlertTriangle,
+  empty: Inbox,
+  search: Search,
+  "arrow-right": ArrowRight,
+  // body-part / difficulty semantic names
+  activity: Activity,
+  dumbbell: Dumbbell,
+  hand: Hand,
+  footprints: Footprints,
+  "more-horizontal": MoreHorizontal,
+  // legacy emoji literals still passed by a few Empty-state call sites
+  "📰": Newspaper,
+  "🎉": PartyPopper,
+  "💬": MessageCircle,
+  "✉️": Mail,
+  "🔕": BellOff,
+  "🏃": Footprints,
+  "🌍": Globe,
+  "📈": TrendingUp,
+  "🏋️": Dumbbell,
+  "🔍": Search,
+  "🤷": HelpCircle,
+  "📋": ClipboardList,
+  "👥": Users,
+};
 
 export function Spinner() {
   return <div className="spinner" />;
 }
 
-export function Empty({ icon = "📭", title, subtitle }: { icon?: string; title: string; subtitle?: string }) {
+export function IconMark({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
+  const Cmp = ICONS[name] || HelpCircle;
+  const px = size === "sm" ? 14 : size === "lg" ? 40 : 18;
+  return <Cmp size={px} strokeWidth={1.8} aria-hidden="true" />;
+}
+
+export function Empty({ icon = "empty", title, subtitle }: { icon?: string; title: string; subtitle?: string }) {
   return (
     <div className="empty">
-      <div className="big">{icon}</div>
-      <div style={{ fontWeight: 700, fontSize: 16 }}>{title}</div>
+      <IconMark name={icon} size="lg" />
+      <div style={{ fontWeight: 700, fontSize: 16, marginTop: 10 }}>{title}</div>
       {subtitle && <div className="muted" style={{ marginTop: 6 }}>{subtitle}</div>}
     </div>
   );
@@ -27,24 +107,59 @@ export function Badge({ text, color = "var(--primary)" }: { text: string; color?
 export function Avatar({ name, size = 44 }: { name?: string; size?: number }) {
   const initials = (name || "?")
     .split(" ")
-    .map((w) => w[0])
+    .map((word) => word[0])
     .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
   return (
-    <div className="avatar" style={{ width: size, height: size, fontSize: size * 0.36 }}>
+    <div className="avatar" style={{ width: size, height: size, fontSize: size * 0.32 }}>
       {initials}
     </div>
   );
 }
 
-export function Stat({ label, value, icon, grad }: { label: string; value: string | number; icon: string; grad: string }) {
+export function IconTile({ icon }: { icon: string; /** Kept for call-site compatibility; unused in the flat design. */ grad?: string }) {
+  return (
+    <div className="tile">
+      <IconMark name={icon} />
+    </div>
+  );
+}
+
+export function Stat({ label, value, icon, grad }: { label: string; value: string | number; icon: string; grad?: string }) {
   return (
     <div className="card stat">
-      <div className="tile" style={{ background: grad }}>{icon}</div>
+      <IconTile icon={icon} grad={grad} />
       <div className="val">{value}</div>
       <div className="lbl">{label}</div>
+    </div>
+  );
+}
+
+/** Numbered section header with a rule line — mirrors the mobile `SLabel` atom. */
+export function SLabel({ n, label, right }: { n: string; label: string; right?: string }) {
+  return (
+    <div className="slabel">
+      <span className="n">{n}</span>
+      <span className="rule" />
+      <span className="lbl">{label}</span>
+      {right && <span className="right">{right}</span>}
+    </div>
+  );
+}
+
+/** Scrolling marquee status strip. Renders 3 copies so wide viewports stay fully covered mid-loop. */
+export function Ticker({ items, bg = "var(--primary)", fg = "var(--bg)" }: { items: string[]; bg?: string; fg?: string }) {
+  const text = items.join("   ◆   ");
+  return (
+    <div className="ticker" style={{ background: bg }}>
+      <div className="ticker-track">
+        <span style={{ color: fg }}>{text}</span>
+        <span style={{ color: fg }}>{text}</span>
+        <span style={{ color: fg }}>{text}</span>
+      </div>
     </div>
   );
 }
@@ -65,17 +180,94 @@ export function BarChart({ data, color, max = 10 }: { data: { label: string; val
   );
 }
 
+const chartTooltipStyle = {
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 0,
+  fontFamily: "var(--font-mono)",
+  fontSize: 11,
+};
+const chartTick = { fontSize: 10, fill: "var(--muted)", fontFamily: "var(--font-mono)" };
+
+/** Gradient-filled area trend chart (e.g. ROM / check-in scores over time). */
+export function TrendAreaChart({
+  data,
+  dataKey,
+  color = "var(--primary)",
+  height = 160,
+  gradientId,
+  showTooltip = true,
+}: {
+  data: Record<string, unknown>[];
+  dataKey: string;
+  color?: string;
+  height?: number;
+  gradientId: string;
+  showTooltip?: boolean;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <AreaChart data={data} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={color} stopOpacity={0.28} />
+            <stop offset="95%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid stroke="var(--border)" strokeDasharray="4 4" vertical={false} />
+        <XAxis dataKey="label" tick={chartTick} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+        <YAxis tick={chartTick} axisLine={false} tickLine={false} />
+        {showTooltip && <Tooltip contentStyle={chartTooltipStyle} />}
+        <Area type="monotone" dataKey={dataKey} stroke={color} fill={`url(#${gradientId})`} strokeWidth={2} dot={false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+/** Two-line comparison chart (e.g. patient vs. reference trajectory). */
+export function TrendLineChart({
+  data,
+  lines,
+  height = 140,
+}: {
+  data: Record<string, unknown>[];
+  lines: { dataKey: string; color: string; dashed?: boolean }[];
+  height?: number;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data} margin={{ top: 4, right: 8, left: -24, bottom: 0 }}>
+        <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="label" tick={chartTick} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+        <YAxis tick={chartTick} axisLine={false} tickLine={false} />
+        <Tooltip contentStyle={chartTooltipStyle} />
+        {lines.map((l) => (
+          <Line
+            key={l.dataKey}
+            type="monotone"
+            dataKey={l.dataKey}
+            stroke={l.color}
+            strokeWidth={l.dashed ? 1.5 : 2}
+            strokeDasharray={l.dashed ? "5 3" : undefined}
+            dot={false}
+          />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
 export function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="card modal" onClick={(e) => e.stopPropagation()}>
+      <div className="card modal" onClick={(event) => event.stopPropagation()}>
         {children}
       </div>
     </div>
   );
 }
 
-export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
+export function useApi<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,8 +277,8 @@ export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
     setError(null);
     try {
       setData(await fn());
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Something went wrong");
+    } catch (error) {
+      setError(error instanceof ApiError ? error.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -100,16 +292,23 @@ export function useApi<T>(fn: () => Promise<T>, deps: any[] = []) {
   return { data, loading, error, reload, setData };
 }
 
-export const BODY_PART_META: Record<string, { label: string; icon: string; grad: string }> = {
-  SHOULDER: { label: "Shoulder", icon: "💪", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
-  ELBOW: { label: "Elbow", icon: "🦾", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
-  WRIST: { label: "Wrist", icon: "✋", grad: "linear-gradient(135deg,#34d399,#059669)" },
-  HIP: { label: "Hip", icon: "🦵", grad: "linear-gradient(135deg,#fb7185,#e11d48)" },
-  KNEE: { label: "Knee", icon: "🦵", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
-  ANKLE: { label: "Ankle", icon: "🦶", grad: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
-  BACK: { label: "Back", icon: "🧍", grad: "linear-gradient(135deg,#34d399,#059669)" },
-  NECK: { label: "Neck", icon: "🧎", grad: "linear-gradient(135deg,#fbbf24,#d97706)" },
-  OTHER: { label: "Other", icon: "⚙️", grad: "linear-gradient(135deg,#22d3ee,#0891b2)" },
+/** ≥80 → success, ≥70 → warning, else danger — the app-wide quality/ROM threshold convention. */
+export function quality(value: number): string {
+  if (value >= 80) return "var(--success)";
+  if (value >= 70) return "var(--warning)";
+  return "var(--danger)";
+}
+
+export const BODY_PART_META: Record<string, { label: string; icon: string }> = {
+  SHOULDER: { label: "Shoulder", icon: "activity" },
+  ELBOW: { label: "Elbow", icon: "dumbbell" },
+  WRIST: { label: "Wrist", icon: "hand" },
+  HIP: { label: "Hip", icon: "footprints" },
+  KNEE: { label: "Knee", icon: "footprints" },
+  ANKLE: { label: "Ankle", icon: "footprints" },
+  BACK: { label: "Back", icon: "activity" },
+  NECK: { label: "Neck", icon: "activity" },
+  OTHER: { label: "Other", icon: "more-horizontal" },
 };
 
 export const DIFFICULTY_META: Record<string, { label: string; color: string }> = {
@@ -126,15 +325,17 @@ export const ASSIGNMENT_STATUS: Record<string, { label: string; color: string }>
 };
 
 export function statusMeta(status?: string) {
-  return (status && ASSIGNMENT_STATUS[status]) || { label: status || "—", color: "var(--muted)" };
+  return (status && ASSIGNMENT_STATUS[status]) || { label: status || "-", color: "var(--muted)" };
 }
 
 export function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
   return new Date(iso).toLocaleDateString();
 }
+
+export { CheckCircle2 };

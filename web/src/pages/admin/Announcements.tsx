@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Announcement, api } from "../../api/client";
-import { Badge, Empty, Modal, Spinner, useApi } from "../../components/ui";
+import { Badge, Empty, IconTile, Modal, Spinner, useApi } from "../../components/ui";
 
 type Draft = Partial<Announcement>;
 
@@ -21,18 +21,18 @@ export default function AdminAnnouncements() {
     <>
       <div className="spread">
         <h1 className="section-title" style={{ margin: 0 }}>News & events</h1>
-        <button className="btn" onClick={() => setEditing({ ...BLANK })}>➕ New post</button>
+        <button className="btn" onClick={() => setEditing({ ...BLANK })}>New post</button>
       </div>
 
       {loading ? (
         <Spinner />
       ) : (data || []).length === 0 ? (
-        <Empty icon="📰" title="No posts yet" subtitle="Create news or an event to show in the apps." />
+        <Empty icon="news" title="No posts yet" subtitle="Create news or an event to show in the apps." />
       ) : (
         <div className="grid" style={{ marginTop: 16 }}>
           {data!.map((a) => (
             <div key={a.id} className="card row">
-              <div className="tile" style={{ background: a.kind === "EVENT" ? "linear-gradient(135deg,#8b5cf6,#6d28d9)" : "linear-gradient(135deg,#22d3ee,#0891b2)" }}>{a.kind === "EVENT" ? "📅" : "📰"}</div>
+              <IconTile icon="news" />
               <div className="col" style={{ flex: 1 }}>
                 <div className="row" style={{ gap: 8 }}>
                   <span style={{ fontWeight: 700 }}>{a.title}</span>
@@ -99,8 +99,8 @@ function Editor({ draft, onClose, onSaved }: { draft: Draft; onClose: () => void
       <div className="field">
         <label>TYPE</label>
         <div className="chips">
-          <button className={`chip ${d.kind === "NEWS" ? "active" : ""}`} onClick={() => set({ kind: "NEWS" })}>📰 News</button>
-          <button className={`chip ${d.kind === "EVENT" ? "active" : ""}`} onClick={() => set({ kind: "EVENT" })}>📅 Event</button>
+          <button className={`chip ${d.kind === "NEWS" ? "active" : ""}`} onClick={() => set({ kind: "NEWS" })}>News</button>
+          <button className={`chip ${d.kind === "EVENT" ? "active" : ""}`} onClick={() => set({ kind: "EVENT" })}>Event</button>
         </div>
       </div>
       <div className="field">

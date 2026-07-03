@@ -9,16 +9,18 @@ import { NotificationBell } from "../../components/NotificationBell";
 import { Hero, Screen } from "../../components/Screen";
 import {
   Card,
+  Corners,
   EmptyState,
-  IconTile,
   Ionicons,
   Loading,
   PrimaryButton,
   ProgressBar,
   SectionTitle,
+  SLabel,
   StatCard,
+  Ticker,
 } from "../../components/ui";
-import { colors, gradients, spacing, type as T } from "../../theme";
+import { colors, disp, mono, spacing, type as T } from "../../theme";
 
 export default function PatientHomeScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -52,6 +54,20 @@ export default function PatientHomeScreen({ navigation }: any) {
 
   const today = assignments.find((a) => a.status === "ACTIVE") || assignments[0];
   const latest = assessments[0];
+  const queue = today ? [...(today.program.program_exercises || [])].sort((a, b) => a.order - b.order) : [];
+
+  const goToToday = () =>
+    today &&
+    navigation.navigate("Programs", {
+      screen: "ProgramDetail",
+      params: { program: today.program, assignmentId: today.id, status: today.status },
+    });
+
+  const tickerItems = [
+    today ? `${today.program.name.toUpperCase()} · ${today.status.replace("_", " ")}` : "NO ACTIVE PROGRAM",
+    `PROGRAMS · ${assignments.length}`,
+    latest ? `LAST PAIN · ${latest.pain_level}/10` : "NO CHECK-INS LOGGED",
+  ];
 
   return (
     <Screen
@@ -66,6 +82,7 @@ export default function PatientHomeScreen({ navigation }: any) {
         title={`Hi, ${(user?.full_name || "there").split(" ")[0]}`}
         right={<NotificationBell onPress={() => navigation.navigate("Notifications")} />}
       />
+      <Ticker items={tickerItems} />
 
       <View style={styles.body}>
         {loading ? (
@@ -84,9 +101,9 @@ export default function PatientHomeScreen({ navigation }: any) {
             )}
 
             <View style={styles.statsRow}>
-              <StatCard label="Programs" value={assignments.length} icon="list-outline" grad={gradients.primary} />
-              <StatCard label="Check-ins" value={assessments.length} icon="clipboard-outline" grad={gradients.emerald} />
-              <StatCard label="Pain" value={latest ? `${latest.pain_level}/10` : "—"} icon="pulse-outline" grad={gradients.rose} />
+              <StatCard label="Programs" value={assignments.length} icon="list-outline" />
+              <StatCard label="Check-ins" value={assessments.length} icon="clipboard-outline" />
+              <StatCard label="Pain" value={latest ? `${latest.pain_level}/10` : "-"} icon="pulse-outline" />
             </View>
 
             {feed.length > 0 && (
@@ -101,33 +118,49 @@ export default function PatientHomeScreen({ navigation }: any) {
               </>
             )}
 
-            <SectionTitle title="Today's focus" />
+            <View style={{ marginBottom: spacing(1) }}>
+              <SLabel n="01" label="Next up" />
+            </View>
             {today ? (
-              <Card>
-                <View style={styles.todayHead}>
-                  <IconTile icon="play" grad={gradients.primary} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={T.h2}>{today.program.name}</Text>
-                    <Text style={T.muted}>{today.program.exercise_count} exercise(s)</Text>
-                  </View>
+              <View style={styles.nextUp}>
+                <Corners color={colors.primary} sz={9} />
+                <Text style={mono(9, colors.textMuted, "semibold", { marginBottom: 6 })}>
+                  {`NEXT UP · ${today.program.exercise_count} EXERCISE(S)`}
+                </Text>
+                <Text style={disp(24, colors.text, { marginBottom: 10 })}>{today.program.name}</Text>
+                <View style={{ flexDirection: "row", gap: 12, marginBottom: 14 }}>
+                  <Text style={mono(9, colors.textMuted)}>{today.status.replace("_", " ")}</Text>
+                  {today.program.author ? <Text style={mono(9, colors.textMuted)}>{today.program.author}</Text> : null}
                 </View>
-                <View style={{ height: spacing(1.5) }} />
-                <PrimaryButton
-                  title="Start session"
-                  icon="play"
-                  onPress={() =>
-                    navigation.navigate("Programs", {
-                      screen: "ProgramDetail",
-                      params: { program: today.program, assignmentId: today.id, status: today.status },
-                    })
-                  }
-                />
-              </Card>
+                <PrimaryButton title="Start session" icon="play" onPress={goToToday} />
+              </View>
             ) : (
               <EmptyState icon="list-outline" title="No program yet" subtitle="Once your trainer assigns a program, it shows up here." />
             )}
 
-            <SectionTitle title="How you feel" />
+            {queue.length > 0 && (
+              <>
+                <View style={{ marginTop: spacing(2.5), marginBottom: spacing(1) }}>
+                  <SLabel n="02" label="Exercise queue" />
+                </View>
+                <View style={styles.queue}>
+                  {queue.map((pe, i) => (
+                    <View key={pe.id} style={[styles.queueRow, i < queue.length - 1 && styles.queueRowDivider]}>
+                      <Text style={mono(9, colors.textMuted, "bold", { width: 20 })}>{String(i + 1).padStart(2, "0")}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={T.body}>{pe.exercise.title}</Text>
+                        <Text style={T.muted}>{pe.sets} sets × {pe.reps} reps</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+
+            <View style={{ marginTop: spacing(2.5), marginBottom: spacing(1) }}>
+              <SLabel n="03" label="How you feel" />
+            </View>
             <Card style={styles.feelCard} onPress={() => navigation.navigate("Progress", { screen: "Assessment", initial: false })}>
               <View style={{ flex: 1, gap: 8 }}>
                 <Text style={T.body}>Daily check-in</Text>
@@ -137,7 +170,7 @@ export default function PatientHomeScreen({ navigation }: any) {
                     <ProgressBar value={latest.mobility_score * 10} color={colors.success} />
                   </>
                 ) : (
-                  <Text style={T.muted}>Log today's pain & mobility</Text>
+                  <Text style={T.muted}>Log today's pain and mobility</Text>
                 )}
               </View>
               <Ionicons name="add-circle" size={30} color={colors.primary} />
@@ -153,7 +186,10 @@ const styles = StyleSheet.create({
   body: { padding: spacing(2.5), gap: spacing(1) },
   linkCard: { flexDirection: "row", alignItems: "center", gap: spacing(1.5), marginBottom: spacing(2), borderColor: colors.primary },
   statsRow: { flexDirection: "row", gap: spacing(1.25), marginBottom: spacing(2) },
-  todayHead: { flexDirection: "row", alignItems: "center", gap: spacing(1.5) },
+  nextUp: { borderWidth: 1, borderColor: colors.border, padding: spacing(2), position: "relative" },
+  queue: { borderWidth: 1, borderColor: colors.border },
+  queueRow: { flexDirection: "row", alignItems: "center", gap: spacing(1.25), paddingHorizontal: spacing(1.75), paddingVertical: spacing(1.25) },
+  queueRowDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
   feelCard: { flexDirection: "row", alignItems: "center", gap: spacing(1.5) },
   link: { color: colors.primary, fontWeight: "700" },
 });

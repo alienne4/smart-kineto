@@ -1,11 +1,11 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useLayoutEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, BODY_PARTS, DIFFICULTIES, Exercise } from "../../api/client";
 import { PoseCapture } from "../../components/PoseCapture";
 import { Card, Chip, Field, Ionicons, PrimaryButton } from "../../components/ui";
-import { BODY_PART_META, colors, DIFFICULTY_META, radius, spacing, type as T } from "../../theme";
+import { BODY_PART_META, colors, DIFFICULTY_META, mono, spacing, type as T } from "../../theme";
 
 interface PickedFile {
   uri: string;
@@ -92,10 +92,21 @@ export default function CreateExerciseScreen({ navigation, route }: any) {
       </View>
 
       <Text style={styles.label}>DIFFICULTY</Text>
-      <View style={styles.chips}>
-        {DIFFICULTIES.map((d) => (
-          <Chip key={d} label={DIFFICULTY_META[d]?.label || d} active={difficulty === d} onPress={() => setDifficulty(d)} />
-        ))}
+      <View style={styles.segRow}>
+        {DIFFICULTIES.map((d) => {
+          const meta = DIFFICULTY_META[d];
+          const active = difficulty === d;
+          const c = meta?.color || colors.textMuted;
+          return (
+            <Pressable
+              key={d}
+              onPress={() => setDifficulty(d)}
+              style={[styles.segCell, { borderColor: active ? c : colors.border, backgroundColor: active ? `${c}26` : colors.surfaceAlt }]}
+            >
+              <Text style={mono(10, active ? c : colors.textMuted, "bold")}>{(meta?.label || d).toUpperCase()}</Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       <Text style={styles.label}>DEMONSTRATION VIDEO</Text>
@@ -106,7 +117,9 @@ export default function CreateExerciseScreen({ navigation, route }: any) {
             <Text style={T.body}>Pose-detected video attached</Text>
             <Text style={T.muted}>The processed playback will be used.</Text>
           </View>
-          <Ionicons name="close-circle-outline" size={22} color={colors.textMuted} onPress={() => { setPoseJobId(null); setPoseOutputUrl(null); }} />
+          <Pressable onPress={() => { setPoseJobId(null); setPoseOutputUrl(null); }} hitSlop={10}>
+            <Ionicons name="close-circle-outline" size={22} color={colors.textMuted} />
+          </Pressable>
         </Card>
       ) : (
         <>
@@ -150,7 +163,9 @@ const styles = StyleSheet.create({
   content: { padding: spacing(2.5) },
   label: { ...T.label, marginBottom: spacing(1), marginTop: spacing(1.5) },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing(1), marginBottom: spacing(1) },
+  segRow: { flexDirection: "row", gap: spacing(1), marginBottom: spacing(1) },
+  segCell: { flex: 1, borderWidth: 1, paddingVertical: spacing(1.25), alignItems: "center" },
   mediaCard: { flexDirection: "row", alignItems: "center", gap: spacing(1.5) },
-  thumb: { width: 48, height: 48, borderRadius: radius.sm, backgroundColor: colors.surfaceHi },
+  thumb: { width: 48, height: 48, backgroundColor: colors.surfaceHi },
   error: { color: colors.danger, marginTop: spacing(2) },
 });

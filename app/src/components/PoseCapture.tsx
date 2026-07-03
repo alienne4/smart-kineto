@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { api, ApiError, PoseJob } from "../api/client";
-import { colors, radius, spacing, type as T } from "../theme";
+import { colors, mono, spacing, type as T } from "../theme";
 import { Card, Ionicons, Notice, PrimaryButton, ProgressBar } from "./ui";
 
 interface Recorded {
@@ -82,12 +82,12 @@ export function PoseCapture({ onUseVideo }: { onUseVideo: (jobId: string, output
     return (
       <View style={styles.row}>
         <Pressable style={[styles.option, { borderColor: colors.primary }]} onPress={() => setMode("capture")}>
-          <Ionicons name="body-outline" size={26} color={colors.primary} />
+          <Ionicons name="body-outline" size={24} color={colors.primary} />
           <Text style={styles.optionTitle}>Pose detection</Text>
           <Text style={T.muted}>Record & detect your skeleton</Text>
         </Pressable>
-        <Pressable style={[styles.option, { borderColor: colors.accent }]} onPress={() => setMode("wand")}>
-          <Ionicons name="bluetooth-outline" size={26} color={colors.accent} />
+        <Pressable style={[styles.option, { borderColor: colors.border }]} onPress={() => setMode("wand")}>
+          <Ionicons name="bluetooth-outline" size={24} color={colors.textMuted} />
           <Text style={styles.optionTitle}>SmartKineto wand</Text>
           <Text style={T.muted}>Pair the motion wand</Text>
         </Pressable>
@@ -99,7 +99,7 @@ export function PoseCapture({ onUseVideo }: { onUseVideo: (jobId: string, output
     return (
       <Card>
         <View style={{ flexDirection: "row", alignItems: "center", gap: spacing(1.5) }}>
-          <Ionicons name="bluetooth-outline" size={24} color={colors.accent} />
+          <Ionicons name="bluetooth-outline" size={24} color={colors.textMuted} />
           <Text style={[T.body, { flex: 1 }]}>Bluetooth wand pairing is coming soon — it will stream live motion while you record.</Text>
         </View>
         <View style={{ height: spacing(1.5) }} />
@@ -115,7 +115,7 @@ export function PoseCapture({ onUseVideo }: { onUseVideo: (jobId: string, output
 
       {done ? (
         <>
-          <Text style={styles.heading}>Detected pose playback</Text>
+          <Text style={styles.heading}>DETECTED POSE PLAYBACK</Text>
           <VideoView player={player} style={styles.video} contentFit="contain" nativeControls />
           <Text style={[T.muted, { marginTop: spacing(1) }]}>Skeleton detected in {job!.detected_frames} frame(s).</Text>
           <View style={{ height: spacing(1.5) }} />
@@ -125,13 +125,13 @@ export function PoseCapture({ onUseVideo }: { onUseVideo: (jobId: string, output
         </>
       ) : processing ? (
         <>
-          <Text style={styles.heading}>Analyzing movement…</Text>
+          <Text style={styles.heading}>ANALYZING MOVEMENT…</Text>
           <ProgressBar value={Math.max(5, job!.progress)} />
           <Text style={[T.muted, { marginTop: spacing(1) }]}>{job!.progress}% · running pose detection on the server</Text>
         </>
       ) : recorded ? (
         <>
-          <Text style={styles.heading}>Review your recording</Text>
+          <Text style={styles.heading}>REVIEW YOUR RECORDING</Text>
           <VideoView player={player} style={styles.video} contentFit="contain" nativeControls />
           <View style={{ height: spacing(1.5) }} />
           <PrimaryButton title="Run pose detection" icon="body-outline" loading={uploading} onPress={runDetection} />
@@ -140,7 +140,7 @@ export function PoseCapture({ onUseVideo }: { onUseVideo: (jobId: string, output
         </>
       ) : (
         <>
-          <Text style={styles.heading}>Record a demonstration</Text>
+          <Text style={styles.heading}>RECORD A DEMONSTRATION</Text>
           <Text style={T.muted}>Film yourself performing the exercise. Keep your whole body in frame.</Text>
           <View style={{ height: spacing(1.5) }} />
           <PrimaryButton title="Open camera" icon="videocam-outline" onPress={record} />
@@ -157,12 +157,11 @@ const styles = StyleSheet.create({
   option: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: radius.md,
     backgroundColor: colors.surface,
     padding: spacing(2),
     gap: 4,
   },
   optionTitle: { ...T.body, fontWeight: "800", marginTop: spacing(1) },
-  heading: { ...T.body, fontWeight: "800", marginBottom: spacing(1) },
-  video: { width: "100%", height: 220, borderRadius: radius.sm, backgroundColor: "#000" },
+  heading: { ...mono(9, colors.textMuted, "semibold"), letterSpacing: 1, marginBottom: spacing(1.25) },
+  video: { width: "100%", height: 220, borderWidth: 1, borderColor: colors.border, backgroundColor: "#000" },
 });

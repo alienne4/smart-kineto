@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { api, Assignment, TrainingProgram } from "../../api/client";
-import { Badge, Empty, Spinner, statusMeta, useApi } from "../../components/ui";
+import { Badge, Empty, IconTile, Spinner, statusMeta, useApi } from "../../components/ui";
 
 export default function PatientPrograms() {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ function Mine({ navigate }: { navigate: (to: string) => void }) {
       {data.map((a) => (
         <div key={a.id} className="card click" onClick={() => navigate(`/programs/${a.program.id}`)}>
           <div className="spread">
-            <div className="tile" style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>📋</div>
+            <IconTile icon="programs" />
             <Badge text={statusMeta(a.status).label} color={statusMeta(a.status).color} />
           </div>
           <div style={{ fontWeight: 700, marginTop: 12 }}>{a.program.name}</div>
@@ -78,7 +78,7 @@ function Browse() {
         return (
           <div key={p.id} className="card">
             <div className="spread">
-              <div className="tile" style={{ background: "linear-gradient(135deg,#22d3ee,#0891b2)" }}>📋</div>
+              <IconTile icon="programs" />
               {p.is_template ? <Badge text="LIBRARY" color="var(--accent)" /> : <Badge text="PUBLIC" color="var(--success)" />}
             </div>
             <div style={{ fontWeight: 700, marginTop: 12 }}>{p.name}</div>

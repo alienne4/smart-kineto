@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api, BODY_PARTS, DIFFICULTIES } from "../../api/client";
 import { PoseRecorder } from "../../components/PoseRecorder";
-import { BODY_PART_META, DIFFICULTY_META, Spinner } from "../../components/ui";
+import { BODY_PART_META, DIFFICULTY_META, IconMark, Spinner } from "../../components/ui";
 
 export default function ExerciseForm() {
   const { id } = useParams();
@@ -74,17 +74,23 @@ export default function ExerciseForm() {
           <label>BODY PART</label>
           <div className="chips">
             {BODY_PARTS.map((p) => (
-              <button type="button" key={p} className={`chip ${bodyPart === p ? "active" : ""}`} onClick={() => setBodyPart(p)}>
-                {BODY_PART_META[p].icon} {BODY_PART_META[p].label}
+              <button
+                type="button"
+                key={p}
+                className={`chip ${bodyPart === p ? "active" : ""}`}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+                onClick={() => setBodyPart(p)}
+              >
+                <IconMark name={BODY_PART_META[p].icon} size="sm" /> {BODY_PART_META[p].label}
               </button>
             ))}
           </div>
         </div>
         <div className="field">
           <label>DIFFICULTY</label>
-          <div className="chips">
+          <div className="segment" style={{ marginBottom: 0 }}>
             {DIFFICULTIES.map((d) => (
-              <button type="button" key={d} className={`chip ${difficulty === d ? "active" : ""}`} onClick={() => setDifficulty(d)}>
+              <button type="button" key={d} className={difficulty === d ? "active" : ""} onClick={() => setDifficulty(d)}>
                 {DIFFICULTY_META[d].label}
               </button>
             ))}
@@ -99,8 +105,8 @@ export default function ExerciseForm() {
           <label>DEMONSTRATION VIDEO</label>
           {poseOutputUrl ? (
             <div className="card" style={{ background: "var(--surface-alt)" }}>
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>Pose-detected video attached ✓</div>
-              <video src={poseOutputUrl} controls loop style={{ width: "100%", borderRadius: 12, background: "#000" }} />
+              <div style={{ fontWeight: 700, marginBottom: 8 }}>Pose-detected video attached</div>
+              <video src={poseOutputUrl} controls loop style={{ width: "100%", background: "#000" }} />
               <button type="button" className="btn ghost sm" style={{ marginTop: 10 }} onClick={() => { setPoseJobId(null); setPoseOutputUrl(null); }}>
                 Remove & choose again
               </button>
