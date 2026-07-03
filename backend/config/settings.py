@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "adminapi",
     "assistant",
     "pose",
+    "wand",
 ]
 
 MIDDLEWARE = [

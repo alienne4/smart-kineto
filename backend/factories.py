@@ -94,3 +94,27 @@ def assign_program(program, patient, assigned_by=None):
     return ProgramAssignment.objects.create(
         program=program, patient=patient, assigned_by=assigned_by
     )
+
+
+def make_wand_template(exercise, created_by=None, **overrides):
+    from wand.models import WandReferenceTemplate
+
+    frames = overrides.pop(
+        "frames", [{"roll": 0.0, "pitch": 0.0, "gx": 0.0, "gy": 0.0, "gz": 0.0} for _ in range(100)]
+    )
+    defaults = {
+        "frames": frames,
+        "sample_count": len(frames),
+        "rep_count": overrides.pop("rep_count", 1),
+        "duration_ms": overrides.pop("duration_ms", 1000),
+    }
+    defaults.update(overrides)
+    return WandReferenceTemplate.objects.create(exercise=exercise, created_by=created_by, **defaults)
+
+
+def make_wand_session(exercise, patient, **overrides):
+    from wand.models import WandSession
+
+    defaults = {"target_reps": overrides.pop("target_reps", 3)}
+    defaults.update(overrides)
+    return WandSession.objects.create(exercise=exercise, patient=patient, **defaults)

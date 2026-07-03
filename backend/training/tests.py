@@ -5,9 +5,11 @@ from rest_framework.test import APITestCase
 from notifications.models import Notification
 from training.models import (
     Exercise,
+    ExerciseStage,
     ProgramAssignment,
     ProgramExercise,
     ReviewStatus,
+    TrackingMethod,
     TrainingProgram,
 )
 from factories import (
@@ -138,6 +140,23 @@ class ProgramTests(APITestCase):
         self.client.force_authenticate(user=make_patient())
         resp = self.client.post("/api/programs/", {"name": "x"}, format="json")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_cannot_assign_early_stage_exercise_without_template(self):
+        trainer = make_trainer()
+        ex = make_exercise(
+            created_by=trainer,
+            title="Wand Ex",
+            stage=ExerciseStage.EARLY_STAGE,
+            tracking_method=TrackingMethod.HARDWARE_WAND,
+        )
+        self.client.force_authenticate(user=trainer)
+        payload = {
+            "name": "Early Program",
+            "description": "",
+            "program_exercises": [{"exercise_id": str(ex.id), "order": 0, "sets": 1, "reps": 5}],
+        }
+        resp = self.client.post("/api/programs/", payload, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_public_action_lists_templates_and_public(self):
         trainer = make_trainer()

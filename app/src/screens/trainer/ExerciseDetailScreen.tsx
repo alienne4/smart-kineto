@@ -27,6 +27,7 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
   const [publishing, setPublishing] = useState(false);
 
   const mine = !exercise.is_template && exercise.created_by?.id === user?.id;
+  const isWand = exercise.tracking_method === "HARDWARE_WAND";
 
   useFocusEffect(
     useCallback(() => {
@@ -103,7 +104,13 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
 
       {mine ? <PublishRow status={exercise.review_status} isPublic={exercise.is_public} /> : null}
 
-      {exercise.video ? (
+      {exercise.tracking_method === "HARDWARE_WAND" ? (
+        exercise.has_trainer_template ? (
+          <StatusNotice icon="checkmark-circle" text="Reference template ready" color={colors.success} />
+        ) : (
+          <StatusNotice icon="alert-triangle" text="No reference template yet — patients can't use this until you record one" color={colors.warning} />
+        )
+      ) : exercise.video ? (
         <VideoView player={player} style={styles.video} nativeControls allowsFullscreen contentFit="contain" />
       ) : exercise.thumbnail ? (
         <Image source={{ uri: exercise.thumbnail }} style={styles.video} resizeMode="cover" />
@@ -123,7 +130,21 @@ export default function ExerciseDetailScreen({ route, navigation }: any) {
       <View style={{ height: spacing(3) }} />
       {mine ? (
         <>
-          <PrimaryButton title="Edit exercise" icon="create-outline" onPress={() => navigation.navigate("CreateExercise", { exercise })} />
+          {isWand ? (
+            <>
+              <PrimaryButton
+                title={exercise.has_trainer_template ? "Re-record reference template" : "Record reference template"}
+                icon="bluetooth-outline"
+                onPress={() => navigation.navigate("RecordWandTemplate", { exercise })}
+              />
+              <View style={{ height: spacing(1.25) }} />
+            </>
+          ) : null}
+          <PrimaryButton
+            title="Edit exercise"
+            icon="create-outline"
+            onPress={() => navigation.navigate(isWand ? "CreateHardwareExercise" : "CreateExercise", { exercise })}
+          />
           <View style={{ height: spacing(1.25) }} />
           {exercise.review_status !== "PENDING" && !exercise.is_public ? (
             <PrimaryButton title="Publish to public library" variant="ghost" icon="cloud-upload-outline" onPress={publish} loading={publishing} />

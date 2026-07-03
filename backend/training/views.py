@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -69,6 +69,10 @@ class ExerciseViewSet(viewsets.ModelViewSet):
         ex = self.get_object()
         if ex.created_by_id != request.user.id:
             raise PermissionDenied("You can only publish your own exercises.")
+        if not ex.is_ready_for_assignment:
+            raise ValidationError(
+                "This exercise needs a trainer reference template before it can be published."
+            )
         ex.review_status = ReviewStatus.PENDING
         ex.save(update_fields=["review_status"])
         return Response(ExerciseSerializer(ex, context={"request": request}).data)
