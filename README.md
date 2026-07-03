@@ -10,19 +10,20 @@ Trainers build exercises and multi-week training programs and assign them to pat
 Patients follow the assigned exercises, record a short video of themselves performing the
 movement, and get it analysed by a server-side **MediaPipe pose pipeline** (skeleton overlay +
 rep/ROM extraction) instead of the physical BLE sensor originally scoped in `PLAN.md` — see
-[Status](#status--deviations-from-plan) below. Patients also get an AI assistant (rule-based
+[Deviations from the plan](#deviations-from-planmd) below. Patients also get an AI assistant (rule-based
 exercise recommender), progress tracking, in-app messaging with their trainer, push/in-app
 notifications, and a news/announcements feed. Admins (Django `is_staff` users) get a review
 queue, user list, and announcements management on the web app.
 
-> 📋 Original architecture/spec draft: **[`PLAN.md`](./PLAN.md)** (see Status section for how the
-> shipped implementation diverges from it).
+> 📋 Original architecture/spec draft: **[`PLAN.md`](./PLAN.md)** (see
+> [Deviations from the plan](#deviations-from-planmd) for how the shipped implementation
+> diverges from it).
 
 ## Repo layout
 
 ```
 SmartKinetoFit/
-  PLAN.md              original architecture/spec draft (partially superseded, see Status)
+  PLAN.md              original architecture/spec draft (partially superseded, see Deviations)
   docker-compose.yml   optional Postgres + Redis for full-stack dev
   backend/             Django + DRF + Channels API        (see backend/README.md)
   app/                 Expo / React Native mobile app (Patient + Trainer)
@@ -61,7 +62,7 @@ SmartKinetoFit/
   `web/src/index.css`, `web/src/components/ui.tsx`) are done; page-by-page rollout across the
   web app is still in progress.
 
-### Status — deviations from `PLAN.md`
+### Deviations from PLAN.md
 
 `PLAN.md` is the original pre-build spec and is no longer fully accurate:
 
@@ -71,10 +72,10 @@ SmartKinetoFit/
   Landmarker (`backend/pose/`). Any BLE/ESP32/MPU6050 references in the new `Figma UI/` mockups
   are aspirational design copy, not implemented functionality — don't treat them as real when
   building UI against live data.
-- **Web app** (`web/`) exists and is a first-class surface with its own Admin role; the original
-  plan only scoped the mobile app.
-- **Admin** is a third de-facto role (staff users, `adminapi`), not mentioned in the original
-  two-role (Trainer/Patient) plan.
+- **Web app** (`web/`) exists and is a first-class surface, including an admin console for staff
+  users; the original plan only scoped the mobile app.
+- **Admin** is a de-facto third tier (Django `is_staff` users, served by `adminapi`), not
+  mentioned in the original two-role (Trainer/Patient) plan.
 
 ## Quick start
 
