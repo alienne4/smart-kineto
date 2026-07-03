@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { api, AssistantMessage, AssistantProposal } from "../api/client";
-import { Badge, BODY_PART_META, DIFFICULTY_META, Spinner } from "../components/ui";
+import { Badge, BODY_PART_META, DIFFICULTY_META, IconMark, Spinner } from "../components/ui";
 
 const STARTERS = [
   "My right knee hurts, about 6/10",
@@ -120,7 +120,7 @@ function ProposalCard({ p, accepting, onAccept }: { p: AssistantProposal; accept
           const diff = DIFFICULTY_META[e.difficulty];
           return (
             <div key={e.id} className="row">
-              {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+              {e.thumbnail ? <img className="thumb" src={e.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
               <div className="col" style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{e.title}</div>
                 <div className="faint">{e.sets} sets · {e.reps} reps{diff ? ` · ${diff.label}` : ""}</div>
@@ -130,7 +130,7 @@ function ProposalCard({ p, accepting, onAccept }: { p: AssistantProposal; accept
         })}
       </div>
       <button className="btn success" style={{ width: "100%", marginTop: 14 }} disabled={accepting} onClick={onAccept}>
-        {accepting ? "Adding…" : "✓ Save & start this plan"}
+        {accepting ? "Adding…" : "Save & start this plan"}
       </button>
     </div>
   );

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { api, BODY_PARTS, Exercise } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Badge, BODY_PART_META, DIFFICULTY_META, Empty, Spinner, useApi } from "../../components/ui";
+import { Badge, BODY_PART_META, DIFFICULTY_META, Empty, IconMark, Spinner, useApi } from "../../components/ui";
 
 export default function Exercises() {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ export default function Exercises() {
     <>
       <div className="spread">
         <h1 className="section-title" style={{ margin: 0 }}>Exercises</h1>
-        <button className="btn" onClick={() => navigate("/exercises/new")}>➕ New exercise</button>
+        <button className="btn" onClick={() => navigate("/exercises/new")}>New exercise</button>
       </div>
 
       <div className="segment" style={{ marginTop: 16 }}>
@@ -34,8 +34,13 @@ export default function Exercises() {
       <div className="chips" style={{ marginBottom: 18 }}>
         <button className={`chip ${!part ? "active" : ""}`} onClick={() => setPart(null)}>All</button>
         {BODY_PARTS.map((p) => (
-          <button key={p} className={`chip ${part === p ? "active" : ""}`} onClick={() => setPart(p)}>
-            {BODY_PART_META[p]?.icon} {BODY_PART_META[p]?.label}
+          <button
+            key={p}
+            className={`chip ${part === p ? "active" : ""}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+            onClick={() => setPart(p)}
+          >
+            <IconMark name={BODY_PART_META[p]?.icon} size="sm" /> {BODY_PART_META[p]?.label}
           </button>
         ))}
       </div>
@@ -43,7 +48,7 @@ export default function Exercises() {
       {loading ? (
         <Spinner />
       ) : filtered.length === 0 ? (
-        <Empty icon="🏋️" title={tab === "MINE" ? "No exercises yet" : "Library is empty"} subtitle={tab === "MINE" ? "Create your first exercise." : "Predefined exercises will appear here."} />
+        <Empty icon="dumbbell" title={tab === "MINE" ? "No exercises yet" : "Library is empty"} subtitle={tab === "MINE" ? "Create your first exercise." : "Predefined exercises will appear here."} />
       ) : (
         <div className="grid cols-2">
           {filtered.map((e) => (
@@ -63,7 +68,7 @@ function ExerciseRow({ e, onClick }: { e: Exercise; onClick: () => void }) {
       {e.thumbnail ? (
         <img className="thumb" src={e.thumbnail} alt="" />
       ) : (
-        <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center", fontSize: 22 }}>{meta.icon}</div>
+        <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>
       )}
       <div className="col" style={{ flex: 1 }}>
         <div style={{ fontWeight: 700 }}>{e.title}</div>

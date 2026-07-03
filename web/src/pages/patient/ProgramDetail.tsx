@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { api, Exercise, MEDIA_ORIGIN } from "../../api/client";
-import { Badge, BODY_PART_META, Modal, Spinner, useApi } from "../../components/ui";
-
-const STATUS_META: Record<string, { label: string; color: string }> = {
-  ACTIVE: { label: "Not started", color: "var(--muted)" },
-  IN_PROGRESS: { label: "In progress", color: "var(--warning)" },
-  PAUSED: { label: "Paused", color: "var(--muted)" },
-  COMPLETED: { label: "Completed", color: "var(--success)" },
-};
+import { Badge, BODY_PART_META, IconMark, Modal, Spinner, statusMeta, useApi } from "../../components/ui";
 
 export default function PatientProgramDetail() {
   const { id } = useParams();
@@ -31,7 +24,7 @@ export default function PatientProgramDetail() {
 
   if (loading || !data) return <Spinner />;
   const { program } = data;
-  const sm = status ? STATUS_META[status] : null;
+  const sm = status ? statusMeta(status) : null;
 
   async function ensureStarted() {
     if (!assignmentId || status === "IN_PROGRESS" || status === "COMPLETED") return;
@@ -92,12 +85,12 @@ export default function PatientProgramDetail() {
           return (
             <div key={pe.id} className="card click row" onClick={() => openExercise(pe.exercise)}>
               <div className="avatar" style={{ background: "var(--surface-hi)" }}>{i + 1}</div>
-              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
               <div className="col" style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{pe.exercise.title}</div>
                 <div className="muted">{pe.sets} sets · {pe.reps} reps</div>
               </div>
-              <span style={{ fontSize: 22 }}>▶️</span>
+              <span style={{ fontFamily: "var(--font-mono)", color: "var(--primary)", fontSize: 16 }}>&#9654;</span>
             </div>
           );
         })}
@@ -114,12 +107,12 @@ export default function PatientProgramDetail() {
           <div className="spread"><h2 style={{ margin: 0 }}>{playing.title}</h2><button className="btn ghost sm" onClick={() => setPlaying(null)}>Close</button></div>
           <div style={{ marginTop: 14 }}>
             {playing.video ? (
-              <video src={playing.video.startsWith("http") ? playing.video : MEDIA_ORIGIN + playing.video} controls autoPlay poster={playing.thumbnail || undefined} style={{ width: "100%", borderRadius: 12, background: "#000" }} />
+              <video src={playing.video.startsWith("http") ? playing.video : MEDIA_ORIGIN + playing.video} controls autoPlay poster={playing.thumbnail || undefined} style={{ width: "100%", background: "#000" }} />
             ) : playing.thumbnail ? (
-              <img src={playing.thumbnail} alt="" style={{ width: "100%", borderRadius: 12 }} />
+              <img src={playing.thumbnail} alt="" style={{ width: "100%" }} />
             ) : (
-              <div style={{ height: 160, borderRadius: 12, background: (BODY_PART_META[playing.body_part] || BODY_PART_META.OTHER).grad, display: "grid", placeItems: "center", fontSize: 48 }}>
-                {(BODY_PART_META[playing.body_part] || BODY_PART_META.OTHER).icon}
+              <div style={{ height: 160, border: "1px solid var(--border)", display: "grid", placeItems: "center" }}>
+                <IconMark name={(BODY_PART_META[playing.body_part] || BODY_PART_META.OTHER).icon} size="lg" />
               </div>
             )}
             <p style={{ lineHeight: 1.6 }}>{playing.description || "Follow the movement carefully and breathe steadily."}</p>

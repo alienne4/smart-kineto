@@ -42,7 +42,7 @@ export default function Profile() {
       ) : (
         <>
           <p className="muted">Choose a trainer to guide your recovery.</p>
-          <div className="grid">
+          <div className="grid" style={{ gap: 10 }}>
             {(trainers || []).map((t) => (
               <div key={t.id} className="card row">
                 <Avatar name={t.full_name || t.email} />

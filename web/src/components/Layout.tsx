@@ -67,40 +67,48 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const isAdmin = !!user?.is_admin;
   const baseNav = user?.role === "PATIENT" ? PATIENT_NAV : TRAINER_NAV;
+  const roleLabel = user?.role === "PATIENT" ? "Patient" : user?.role === "TRAINER" ? "Trainer" : "Member";
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
           <div className="logo">SK</div>
-          <h1>SmartKineto</h1>
+          <h1>SmartKinetoFit</h1>
         </div>
-        {baseNav.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
-            <span className="ico">
-              <IconMark name={item.icon} />
-            </span>
-            <span className="label">{item.label}</span>
-          </NavLink>
-        ))}
-        {isAdmin && (
-          <>
-            <div className="faint nav-section">ADMIN</div>
-            {ADMIN_NAV.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
-                <span className="ico">
-                  <IconMark name={item.icon} />
-                </span>
-                <span className="label">{item.label}</span>
-              </NavLink>
-            ))}
-          </>
-        )}
-        <div className="nav-spacer" />
+        <div style={{ padding: "12px 18px", borderBottom: "1px solid var(--border)", fontFamily: "var(--font-mono)" }}>
+          <div style={{ fontSize: 10, color: "var(--text)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            {user?.full_name || "—"}
+          </div>
+          <div style={{ fontSize: 9, color: "var(--faint)", letterSpacing: "0.08em", marginTop: 2, textTransform: "uppercase" }}>{roleLabel}</div>
+        </div>
+        <div style={{ flex: 1, paddingTop: 4 }}>
+          {baseNav.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
+              <span className="ico">
+                <IconMark name={item.icon} size="sm" />
+              </span>
+              <span className="label">{item.label}</span>
+            </NavLink>
+          ))}
+          {isAdmin && (
+            <>
+              <div className="nav-section">Admin</div>
+              {ADMIN_NAV.map((item) => (
+                <NavLink key={item.to} to={item.to} end={item.end} className="nav-link">
+                  <span className="ico">
+                    <IconMark name={item.icon} size="sm" />
+                  </span>
+                  <span className="label">{item.label}</span>
+                </NavLink>
+              ))}
+            </>
+          )}
+        </div>
         <div className="sidebar-foot">
-          <button className="nav-link nav-button" onClick={logout}>
+          <button className="nav-link nav-button" onClick={logout} style={{ padding: 0 }}>
             <span className="ico">
-              <IconMark name="logout" />
+              <IconMark name="logout" size="sm" />
             </span>
             <span className="label">Log out</span>
           </button>
@@ -112,7 +120,7 @@ export default function Layout() {
           <h2>{greeting(user?.full_name)}</h2>
           <div className="topbar-actions">
             <NotificationBell />
-            <Avatar name={user?.full_name || user?.email} size={38} />
+            <Avatar name={user?.full_name || user?.email} size={36} />
           </div>
         </header>
         <div className="content">

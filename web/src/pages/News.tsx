@@ -16,7 +16,7 @@ export default function News() {
           ))}
         </div>
       ) : (
-        <Empty icon="📰" title="Nothing here yet" subtitle="News and events will appear here." />
+        <Empty icon="news" title="Nothing here yet" subtitle="News and events will appear here." />
       )}
     </>
   );

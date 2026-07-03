@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { api } from "../../api/client";
-import { Avatar, Badge, Spinner, useApi } from "../../components/ui";
+import { Avatar, Badge, Empty, Spinner, useApi } from "../../components/ui";
 
 export default function AdminUsers() {
   const { data, loading } = useApi(() => api.adminUsers());
@@ -22,6 +22,8 @@ export default function AdminUsers() {
 
       {loading ? (
         <Spinner />
+      ) : rows.length === 0 ? (
+        <Empty icon="patients" title="No users found" subtitle="No accounts match this filter." />
       ) : (
         <div className="card" style={{ padding: 0, overflowX: "auto" }}>
           <table className="table">

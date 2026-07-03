@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { Avatar, Badge, BODY_PART_META, Modal, Spinner, useApi } from "../../components/ui";
+import { Avatar, Badge, BODY_PART_META, IconMark, Modal, Spinner, useApi } from "../../components/ui";
 
 const REVIEW_COLOR: Record<string, string> = { PENDING: "var(--warning)", APPROVED: "var(--success)", REJECTED: "var(--danger)" };
 
@@ -70,7 +70,7 @@ export default function ProgramDetail() {
           const meta = BODY_PART_META[pe.exercise.body_part] || BODY_PART_META.OTHER;
           return (
             <div key={pe.id} className="card click row" onClick={() => navigate(`/exercises/${pe.exercise.id}`)}>
-              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ background: meta.grad, display: "grid", placeItems: "center" }}>{meta.icon}</div>}
+              {pe.exercise.thumbnail ? <img className="thumb" src={pe.exercise.thumbnail} alt="" /> : <div className="thumb" style={{ display: "grid", placeItems: "center" }}><IconMark name={meta.icon} /></div>}
               <div className="col" style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{pe.exercise.title}</div>
                 <div className="muted">{pe.sets} sets · {pe.reps} reps</div>

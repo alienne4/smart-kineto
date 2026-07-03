@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { ApiError, Role } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import { IconMark } from "../components/ui";
 
 export default function Register() {
   const { register } = useAuth();
@@ -29,8 +30,11 @@ export default function Register() {
   return (
     <div className="center-screen">
       <div className="card auth-card">
-        <h1 style={{ marginTop: 0 }}>Create your account</h1>
-        <p className="muted" style={{ marginTop: -6 }}>Start your recovery journey today.</p>
+        <div className="brand" style={{ padding: 0, marginBottom: 18 }}>
+          <div className="logo">SK</div>
+          <h1 style={{ fontSize: 22 }}>Create your account</h1>
+        </div>
+        <p className="muted" style={{ marginTop: 0 }}>Start your recovery journey today.</p>
         <form onSubmit={submit}>
           <div className="field">
             <label>FULL NAME</label>
@@ -47,8 +51,22 @@ export default function Register() {
           <div className="field">
             <label>I AM A…</label>
             <div className="chips">
-              <button type="button" className={`chip ${role === "PATIENT" ? "active" : ""}`} onClick={() => setRole("PATIENT")}>🏃 Patient</button>
-              <button type="button" className={`chip ${role === "TRAINER" ? "active" : ""}`} onClick={() => setRole("TRAINER")}>🏋️ Trainer</button>
+              <button
+                type="button"
+                className={`chip ${role === "PATIENT" ? "active" : ""}`}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+                onClick={() => setRole("PATIENT")}
+              >
+                <IconMark name="footprints" size="sm" /> Patient
+              </button>
+              <button
+                type="button"
+                className={`chip ${role === "TRAINER" ? "active" : ""}`}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+                onClick={() => setRole("TRAINER")}
+              >
+                <IconMark name="dumbbell" size="sm" /> Trainer
+              </button>
             </div>
           </div>
           {error && <div className="error-text">{error}</div>}

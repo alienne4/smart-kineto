@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { Announcement } from "../api/client";
-import { Badge } from "./ui";
+import { Badge, IconMark } from "./ui";
 
 export function eventWhen(iso: string | null) {
   if (!iso) return "";
@@ -16,7 +16,9 @@ export function NewsCard({ item }: { item: Announcement }) {
       {item.image ? (
         <img className="img" src={item.image} alt="" />
       ) : (
-        <div className="img" style={{ background: isEvent ? "linear-gradient(135deg,#8b5cf6,#6d28d9)" : "linear-gradient(135deg,#22d3ee,#0891b2)" }} />
+        <div className="img" style={{ display: "grid", placeItems: "center", color: isEvent ? "var(--accent)" : "var(--primary)" }}>
+          <IconMark name={isEvent ? "🎉" : "news"} size="lg" />
+        </div>
       )}
       <div className="nbody">
         <Badge text={isEvent ? "EVENT" : "NEWS"} color={isEvent ? "var(--accent)" : "var(--primary)"} />
