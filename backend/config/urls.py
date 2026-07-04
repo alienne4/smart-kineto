@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/", include("adminapi.urls")),
     path("api/", include("assistant.urls")),
     path("api/", include("pose.urls")),
+    path("api/", include("wand.urls")),
 ]
 
 if settings.DEBUG:

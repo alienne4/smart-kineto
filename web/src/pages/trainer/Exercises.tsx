@@ -22,7 +22,10 @@ export default function Exercises() {
     <>
       <div className="spread">
         <h1 className="section-title" style={{ margin: 0 }}>Exercises</h1>
-        <button className="btn" onClick={() => navigate("/exercises/new")}>New exercise</button>
+        <div className="btn-row" style={{ margin: 0 }}>
+          <button className="btn ghost" onClick={() => navigate("/exercises/new-wand")}>+ Hardware wand</button>
+          <button className="btn" onClick={() => navigate("/exercises/new")}>+ Camera pose</button>
+        </div>
       </div>
 
       <div className="segment" style={{ marginTop: 16 }}>

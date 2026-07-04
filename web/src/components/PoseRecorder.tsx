@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { api, MEDIA_ORIGIN, PoseJob } from "../api/client";
 
-type Mode = "choose" | "wand" | "record";
+type Mode = "choose" | "record";
 
 export function PoseRecorder({ onUseVideo }: { onUseVideo: (jobId: string, outputUrl: string) => void }) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("choose");
 
   if (mode === "choose") {
@@ -15,26 +17,11 @@ export function PoseRecorder({ onUseVideo }: { onUseVideo: (jobId: string, outpu
           <div style={{ fontWeight: 800, marginTop: 10 }}>Pose detection</div>
           <div className="muted">Record yourself; we detect your skeleton from the video.</div>
         </button>
-        <button type="button" className="card click" style={{ textAlign: "left", border: "none" }} onClick={() => setMode("wand")}>
+        <button type="button" className="card click" style={{ textAlign: "left", border: "none" }} onClick={() => navigate("/exercises/new-wand")}>
           <div className="tile" style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>📡</div>
-          <div style={{ fontWeight: 800, marginTop: 10 }}>Connect SmartKineto wand</div>
-          <div className="muted">Pair the motion wand over Bluetooth.</div>
+          <div style={{ fontWeight: 800, marginTop: 10 }}>Use the SmartKineto wand instead</div>
+          <div className="muted">Hardware-wand exercises are a separate flow — no video needed.</div>
         </button>
-      </div>
-    );
-  }
-
-  if (mode === "wand") {
-    return (
-      <div className="card">
-        <div className="row" style={{ gap: 12 }}>
-          <div className="tile" style={{ background: "linear-gradient(135deg,#8b5cf6,#6d28d9)" }}>📡</div>
-          <div className="col">
-            <div style={{ fontWeight: 700 }}>SmartKineto wand</div>
-            <div className="muted">Bluetooth pairing is coming soon — the wand will stream live motion while you record.</div>
-          </div>
-        </div>
-        <button type="button" className="btn ghost sm" style={{ marginTop: 14 }} onClick={() => setMode("choose")}>← Back</button>
       </div>
     );
   }

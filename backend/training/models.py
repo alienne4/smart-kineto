@@ -31,6 +31,17 @@ class ReviewStatus(models.TextChoices):
     REJECTED = "REJECTED", "Rejected"
 
 
+class ExerciseStage(models.TextChoices):
+    EARLY_STAGE = "EARLY_STAGE", "Early stage"
+    ADVANCED_STAGE = "ADVANCED_STAGE", "Advanced stage"
+
+
+class TrackingMethod(models.TextChoices):
+    HARDWARE_WAND = "HARDWARE_WAND", "Hardware wand"
+    CAMERA_POSE = "CAMERA_POSE", "Camera pose"
+    MANUAL = "MANUAL", "Manual / no tracking"
+
+
 def exercise_media_path(instance, filename):
     return f"exercises/{instance.id}/{filename}"
 
@@ -57,6 +68,15 @@ class Exercise(models.Model):
     body_part = models.CharField(max_length=16, choices=BodyPart.choices, default=BodyPart.OTHER)
     difficulty = models.CharField(max_length=8, choices=Difficulty.choices, default=Difficulty.EASY)
 
+    stage = models.CharField(
+        max_length=16, choices=ExerciseStage.choices, default=ExerciseStage.ADVANCED_STAGE
+    )
+    tracking_method = models.CharField(
+        max_length=16, choices=TrackingMethod.choices, default=TrackingMethod.CAMERA_POSE
+    )
+    # Meaningful for HARDWARE_WAND exercises: how many valid reps a session should reach.
+    target_reps = models.PositiveIntegerField(default=10)
+
     video = models.FileField(upload_to=exercise_media_path, null=True, blank=True)
     voiceover = models.FileField(upload_to=exercise_media_path, null=True, blank=True)
     thumbnail = models.ImageField(upload_to=exercise_media_path, null=True, blank=True)
@@ -69,6 +89,18 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def requires_trainer_template(self) -> bool:
+        return self.tracking_method == TrackingMethod.HARDWARE_WAND
+
+    @property
+    def has_trainer_template(self) -> bool:
+        return self.requires_trainer_template and hasattr(self, "wand_template")
+
+    @property
+    def is_ready_for_assignment(self) -> bool:
+        return not self.requires_trainer_template or self.has_trainer_template
 
 
 class TrainingProgram(models.Model):

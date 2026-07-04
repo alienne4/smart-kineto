@@ -31,8 +31,18 @@ class ProgramExerciseInline(admin.TabularInline):
 
 @admin.register(Exercise)
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ("title", "body_part", "difficulty", "author_col", "review_status", "is_public", "created_at")
-    list_filter = ("body_part", "difficulty", "review_status", "is_public", "is_template")
+    list_display = (
+        "title",
+        "body_part",
+        "difficulty",
+        "stage",
+        "tracking_method",
+        "author_col",
+        "review_status",
+        "is_public",
+        "created_at",
+    )
+    list_filter = ("stage", "tracking_method", "body_part", "difficulty", "review_status", "is_public", "is_template")
     search_fields = ("title",)
     actions = [approve_publish, reject, unpublish]
 

@@ -20,6 +20,8 @@ import ChatScreen from "../screens/chat/ChatScreen";
 import TrainerHomeScreen from "../screens/trainer/TrainerHomeScreen";
 import ExerciseListScreen from "../screens/trainer/ExerciseListScreen";
 import CreateExerciseScreen from "../screens/trainer/CreateExerciseScreen";
+import CreateHardwareExerciseScreen from "../screens/trainer/CreateHardwareExerciseScreen";
+import RecordWandTemplateScreen from "../screens/trainer/RecordWandTemplateScreen";
 import ExerciseDetailScreen from "../screens/trainer/ExerciseDetailScreen";
 import ProgramListScreen from "../screens/trainer/ProgramListScreen";
 import CreateProgramScreen from "../screens/trainer/CreateProgramScreen";
@@ -36,6 +38,7 @@ import BrowseProgramsScreen from "../screens/patient/BrowseProgramsScreen";
 import AssistantScreen from "../screens/patient/AssistantScreen";
 import PatientProgramDetailScreen from "../screens/patient/ProgramDetailScreen";
 import ExercisePlayerScreen from "../screens/patient/ExercisePlayerScreen";
+import HardwareExercisePlayerScreen from "../screens/patient/HardwareExercisePlayerScreen";
 import AssessmentScreen from "../screens/patient/AssessmentScreen";
 import ProgressScreen from "../screens/patient/ProgressScreen";
 import ProfileScreen from "../screens/patient/ProfileScreen";
@@ -111,6 +114,8 @@ function TrainerExercisesStack() {
     <Stack.Navigator screenOptions={stackOptions}>
       <Stack.Screen name="ExerciseList" component={ExerciseListScreen} options={{ title: "Exercises" }} />
       <Stack.Screen name="CreateExercise" component={CreateExerciseScreen} options={{ title: "New exercise" }} />
+      <Stack.Screen name="CreateHardwareExercise" component={CreateHardwareExerciseScreen} options={{ title: "New hardware exercise" }} />
+      <Stack.Screen name="RecordWandTemplate" component={RecordWandTemplateScreen} options={{ title: "Record reference" }} />
       <Stack.Screen name="ExerciseDetail" component={ExerciseDetailScreen} options={{ title: "Exercise" }} />
     </Stack.Navigator>
   );
@@ -164,6 +169,7 @@ function PatientProgramsStack() {
       <Stack.Screen name="BrowsePrograms" component={BrowseProgramsScreen} options={{ title: "Public programs" }} />
       <Stack.Screen name="ProgramDetail" component={PatientProgramDetailScreen} options={{ title: "Program" }} />
       <Stack.Screen name="ExercisePlayer" component={ExercisePlayerScreen} options={{ title: "Live Session" }} />
+      <Stack.Screen name="HardwareExercisePlayer" component={HardwareExercisePlayerScreen} options={{ title: "Live Session" }} />
     </Stack.Navigator>
   );
 }

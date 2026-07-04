@@ -21,6 +21,7 @@ export default function ExerciseDetail() {
   if (loading || !e) return <Spinner />;
 
   const mine = !e.is_template && e.created_by?.id === user?.id;
+  const isWand = e.tracking_method === "HARDWARE_WAND";
   const meta = BODY_PART_META[e.body_part] || BODY_PART_META.OTHER;
   const diff = DIFFICULTY_META[e.difficulty];
 
@@ -64,12 +65,28 @@ export default function ExerciseDetail() {
           </div>
           <h1 style={{ margin: "4px 0" }}>{e.title}</h1>
           {e.author && <div className="author">by {e.author}</div>}
+
+          {isWand && (
+            e.has_trainer_template ? (
+              <div className="muted" style={{ color: "var(--success)", marginTop: 8 }}>✓ Reference template ready</div>
+            ) : (
+              <div className="error-text" style={{ color: "var(--warning)", marginTop: 8 }}>
+                ⚠ No reference template yet — patients can't use this until you record one
+              </div>
+            )
+          )}
+
           <p style={{ lineHeight: 1.6, marginTop: 14 }}>{e.description || "No instructions provided."}</p>
 
           <div className="btn-row" style={{ marginTop: 8 }}>
             {mine ? (
               <>
-                <button className="btn" onClick={() => navigate(`/exercises/${e.id}/edit`)}>Edit</button>
+                {isWand && (
+                  <button className="btn" onClick={() => navigate(`/exercises/${e.id}/record-wand-template`)}>
+                    {e.has_trainer_template ? "Re-record reference template" : "Record reference template"}
+                  </button>
+                )}
+                <button className="btn ghost" onClick={() => navigate(isWand ? `/exercises/${e.id}/edit-wand` : `/exercises/${e.id}/edit`)}>Edit</button>
                 {(e.review_status === "NONE" || e.review_status === "REJECTED") && (
                   <button className="btn ghost" disabled={busy} onClick={publish}>Publish to library</button>
                 )}

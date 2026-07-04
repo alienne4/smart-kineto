@@ -32,7 +32,8 @@ export default function ProgramDetailScreen({ route, navigation }: any) {
 
   function openExercise(exercise: TrainingProgram["program_exercises"][number]["exercise"]) {
     ensureStarted();
-    navigation.navigate("ExercisePlayer", {
+    const screen = exercise.tracking_method === "HARDWARE_WAND" ? "HardwareExercisePlayer" : "ExercisePlayer";
+    navigation.navigate(screen, {
       exercise,
       assignmentId,
       status: status === "COMPLETED" ? status : "IN_PROGRESS",
@@ -123,7 +124,10 @@ export default function ProgramDetailScreen({ route, navigation }: any) {
             )}
             <View style={{ flex: 1 }}>
               <Text style={T.body}>{pe.exercise.title}</Text>
-              <Text style={T.muted}>{pe.sets} sets × {pe.reps} reps{pe.exercise.video ? " · video" : ""}</Text>
+              <Text style={T.muted}>
+                {pe.sets} sets × {pe.reps} reps
+                {pe.exercise.tracking_method === "HARDWARE_WAND" ? " · wand" : pe.exercise.video ? " · video" : ""}
+              </Text>
             </View>
             <Ionicons name="play" size={20} color={colors.primary} />
           </Card>

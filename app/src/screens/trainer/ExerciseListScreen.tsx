@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "../../auth/AuthContext";
 
@@ -38,12 +38,20 @@ export default function ExerciseListScreen({ navigation }: any) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Pressable style={styles.addBtn} onPress={() => navigation.navigate("CreateExercise")} hitSlop={8}>
+        <Pressable style={styles.addBtn} onPress={pickNewExerciseType} hitSlop={8}>
           <Ionicons name="add" size={18} color={colors.bg} />
         </Pressable>
       ),
     });
   }, [navigation]);
+
+  function pickNewExerciseType() {
+    Alert.alert("New exercise", "Choose exercise type", [
+      { text: "Advanced (camera)", onPress: () => navigation.navigate("CreateExercise") },
+      { text: "Early-stage (hardware wand)", onPress: () => navigation.navigate("CreateHardwareExercise") },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -109,7 +117,11 @@ export default function ExerciseListScreen({ navigation }: any) {
                       <Badge text={meta.label} />
                       <Badge text={diff.label} color={diff.color} />
                       {ex.is_template ? <Badge text="LIBRARY" color={colors.primary} /> : ex.is_public ? <Badge text="PUBLIC" color={colors.success} /> : null}
-                      {ex.video ? <Badge text="VIDEO" color={colors.primary} /> : null}
+                      {ex.tracking_method === "HARDWARE_WAND" ? (
+                        <Badge text={ex.has_trainer_template ? "WAND" : "WAND · NO REF"} color={ex.has_trainer_template ? colors.primary : colors.warning} />
+                      ) : ex.video ? (
+                        <Badge text="VIDEO" color={colors.primary} />
+                      ) : null}
                     </View>
                   </View>
                   <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />

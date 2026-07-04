@@ -4,8 +4,10 @@ from accounts.models import User
 
 from .models import (
     Exercise,
+    ExerciseStage,
     ProgramAssignment,
     ProgramExercise,
+    TrackingMethod,
     TrainingProgram,
 )
 
@@ -39,6 +41,11 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "description",
             "body_part",
             "difficulty",
+            "stage",
+            "tracking_method",
+            "target_reps",
+            "requires_trainer_template",
+            "has_trainer_template",
             "video",
             "voiceover",
             "thumbnail",
@@ -51,11 +58,24 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "is_template",
             "is_public",
             "review_status",
+            "requires_trainer_template",
+            "has_trainer_template",
             "created_at",
         )
 
     def get_author(self, obj):
         return author_label(obj)
+
+    def validate(self, attrs):
+        stage = attrs.get("stage", getattr(self.instance, "stage", ExerciseStage.ADVANCED_STAGE))
+        method = attrs.get(
+            "tracking_method", getattr(self.instance, "tracking_method", TrackingMethod.CAMERA_POSE)
+        )
+        if (stage == ExerciseStage.EARLY_STAGE) != (method == TrackingMethod.HARDWARE_WAND):
+            raise serializers.ValidationError(
+                "Early-stage exercises must use hardware-wand tracking, and vice versa."
+            )
+        return attrs
 
 
 class ProgramExerciseSerializer(serializers.ModelSerializer):
@@ -107,6 +127,18 @@ class TrainingProgramSerializer(serializers.ModelSerializer):
         return obj.program_exercises.count()
 
     def _set_exercises(self, program, items):
+        for item in items:
+            ex = item["exercise"]
+            if not ex.is_ready_for_assignment:
+                raise serializers.ValidationError(
+                    {
+                        "program_exercises": (
+                            f"“{ex.title}” needs a trainer reference template "
+                            "before it can be assigned."
+                        )
+                    }
+                )
+
         program.program_exercises.all().delete()
         for idx, item in enumerate(items):
             ProgramExercise.objects.create(

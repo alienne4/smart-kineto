@@ -22,9 +22,20 @@ npm run android        # launches in the Android emulator
   `http://192.168.1.42:8000`) and make sure the phone is on the same network. Also add that
   host to `DJANGO_ALLOWED_HOSTS` in `backend/.env`.
 
-> **Bluetooth note:** the BLE features (M3+) require a **physical Android phone** with a
-> custom dev client — emulators cannot use real Bluetooth, and BLE native modules don't run
-> in Expo Go. We'll add `expo-dev-client` + `react-native-ble-plx` at that milestone.
+> **Bluetooth note:** the app now ships a real BLE wand client (`src/wand/BleWandClient.ts`,
+> using `react-native-ble-plx`) alongside the `SimulatedWandClient` fallback — see
+> `Firmware/README.md` for the GATT contract it talks to. Real BLE requires a native build:
+>
+> ```powershell
+> npx expo prebuild --platform android   # regenerates android/ (gitignored) from app.json
+> npm run android                        # builds & installs the dev client
+> ```
+>
+> This **only works on a physical Android phone** — emulators cannot use real Bluetooth, and
+> the BLE native module isn't present in Expo Go. `src/wand/index.ts` detects Expo Go
+> automatically and falls back to `SimulatedWandClient` there, so `npm run start` in Expo Go
+> still works for everything except a real device connection. Grant the Bluetooth/location
+> permission prompts on first connect.
 
 ## Structure
 
