@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { api, Exercise, MEDIA_ORIGIN } from "../../api/client";
 import { Badge, BODY_PART_META, IconMark, Modal, Spinner, statusMeta, useApi } from "../../components/ui";
+import WandSessionPlayer from "../../components/WandSessionPlayer";
 
 export default function PatientProgramDetail() {
   const { id } = useParams();
@@ -106,16 +107,22 @@ export default function PatientProgramDetail() {
         <Modal onClose={() => setPlaying(null)}>
           <div className="spread"><h2 style={{ margin: 0 }}>{playing.title}</h2><button className="btn ghost sm" onClick={() => setPlaying(null)}>Close</button></div>
           <div style={{ marginTop: 14 }}>
-            {playing.video ? (
-              <video src={playing.video.startsWith("http") ? playing.video : MEDIA_ORIGIN + playing.video} controls autoPlay poster={playing.thumbnail || undefined} style={{ width: "100%", background: "#000" }} />
-            ) : playing.thumbnail ? (
-              <img src={playing.thumbnail} alt="" style={{ width: "100%" }} />
+            {playing.tracking_method === "HARDWARE_WAND" ? (
+              <WandSessionPlayer exercise={playing} assignmentId={assignmentId} onDone={() => setPlaying(null)} />
             ) : (
-              <div style={{ height: 160, border: "1px solid var(--border)", display: "grid", placeItems: "center" }}>
-                <IconMark name={(BODY_PART_META[playing.body_part] || BODY_PART_META.OTHER).icon} size="lg" />
-              </div>
+              <>
+                {playing.video ? (
+                  <video src={playing.video.startsWith("http") ? playing.video : MEDIA_ORIGIN + playing.video} controls autoPlay poster={playing.thumbnail || undefined} style={{ width: "100%", background: "#000" }} />
+                ) : playing.thumbnail ? (
+                  <img src={playing.thumbnail} alt="" style={{ width: "100%" }} />
+                ) : (
+                  <div style={{ height: 160, border: "1px solid var(--border)", display: "grid", placeItems: "center" }}>
+                    <IconMark name={(BODY_PART_META[playing.body_part] || BODY_PART_META.OTHER).icon} size="lg" />
+                  </div>
+                )}
+                <p style={{ lineHeight: 1.6 }}>{playing.description || "Follow the movement carefully and breathe steadily."}</p>
+              </>
             )}
-            <p style={{ lineHeight: 1.6 }}>{playing.description || "Follow the movement carefully and breathe steadily."}</p>
           </div>
         </Modal>
       )}

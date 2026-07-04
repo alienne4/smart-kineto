@@ -23,6 +23,8 @@ export interface LoginResponse {
   user: AuthUser;
 }
 
+export type TrackingMethod = "HARDWARE_WAND" | "CAMERA_POSE" | "MANUAL";
+
 export interface Exercise {
   id: string;
   created_by?: AuthUser | null;
@@ -34,9 +36,70 @@ export interface Exercise {
   description: string;
   body_part: string;
   difficulty: string;
+  tracking_method: TrackingMethod;
+  target_reps: number;
+  requires_trainer_template?: boolean;
+  has_trainer_template?: boolean;
   video: string | null;
   thumbnail: string | null;
   created_at?: string;
+}
+
+export interface WandFrame {
+  t_ms: number;
+  roll: number;
+  pitch: number;
+  gx: number;
+  gy: number;
+  gz: number;
+}
+
+export interface WandTemplateInfo {
+  id: string;
+  exercise_id: string;
+  sample_count: number;
+  rep_count: number;
+  duration_ms: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type RejectionReason =
+  | "TOO_SHORT"
+  | "TOO_FAST"
+  | "TOO_SLOW"
+  | "UNSTABLE"
+  | "WRONG_DIRECTION"
+  | "INCOMPLETE"
+  | "LOW_SIMILARITY";
+
+export interface WandRepetitionResult {
+  id: string;
+  index: number;
+  duration_ms: number;
+  movement_similarity: number;
+  rom_similarity: number;
+  tempo_similarity: number;
+  smoothness_score: number;
+  graph_score: number;
+  duration_ratio: number;
+  is_valid: boolean;
+  rejection_reason: RejectionReason | "";
+  preview_points: { t: number; candidate_roll: number; candidate_pitch: number; template_roll: number; template_pitch: number }[];
+  created_at: string;
+}
+
+export interface WandSession {
+  id: string;
+  exercise: Exercise;
+  assignment_id: string | null;
+  target_reps: number;
+  valid_reps: number;
+  invalid_reps: number;
+  status: "IN_PROGRESS" | "COMPLETED";
+  started_at: string;
+  completed_at: string | null;
+  repetitions?: WandRepetitionResult[];
 }
 
 export interface ProgramExercise {
@@ -172,6 +235,7 @@ export interface AdminStats {
 
 export const BODY_PARTS = ["SHOULDER", "ELBOW", "WRIST", "HIP", "KNEE", "ANKLE", "BACK", "NECK", "OTHER"] as const;
 export const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"] as const;
+export const TRACKING_METHODS = ["HARDWARE_WAND", "CAMERA_POSE", "MANUAL"] as const;
 
 export class ApiError extends Error {
   status: number;
@@ -256,6 +320,20 @@ export const api = {
   deleteExercise: (id: string) => request<null>(`/exercises/${id}/`, { method: "DELETE" }),
   cloneExercise: (id: string) => request<Exercise>(`/exercises/${id}/clone/`, { method: "POST" }),
   publishExercise: (id: string) => request<Exercise>(`/exercises/${id}/publish/`, { method: "POST" }),
+
+  // --- hardware wand ---
+  getWandTemplate: (exerciseId: string) => request<WandTemplateInfo>(`/wand/templates/${exerciseId}/`),
+  createWandTemplate: (payload: { exercise_id: string; repetitions: { frames: WandFrame[]; duration_ms: number }[] }) =>
+    request<WandTemplateInfo>("/wand/templates/", { method: "POST", body: payload }),
+  startWandSession: (payload: { exercise_id: string; assignment_id?: string; target_reps?: number }) =>
+    request<WandSession>("/wand/sessions/", { method: "POST", body: payload }),
+  getWandSession: (id: string) => request<WandSession>(`/wand/sessions/${id}/`),
+  submitWandRepetition: (sessionId: string, payload: { frames: WandFrame[]; duration_ms: number }) =>
+    request<{ repetition: WandRepetitionResult; session: WandSession }>(`/wand/sessions/${sessionId}/repetitions/`, {
+      method: "POST",
+      body: payload,
+    }),
+  completeWandSession: (id: string) => request<WandSession>(`/wand/sessions/${id}/complete/`, { method: "POST" }),
 
   listPrograms: () => request<TrainingProgram[]>("/programs/"),
   listPublicPrograms: () => request<TrainingProgram[]>("/programs/public/"),

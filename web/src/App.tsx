@@ -15,6 +15,8 @@ import NewsDetail from "./pages/NewsDetail";
 import TrainerDashboard from "./pages/trainer/Dashboard";
 import Exercises from "./pages/trainer/Exercises";
 import ExerciseForm from "./pages/trainer/ExerciseForm";
+import WandExerciseForm from "./pages/trainer/WandExerciseForm";
+import RecordWandTemplate from "./pages/trainer/RecordWandTemplate";
 import ExerciseDetail from "./pages/trainer/ExerciseDetail";
 import Programs from "./pages/trainer/Programs";
 import ProgramForm from "./pages/trainer/ProgramForm";
@@ -69,8 +71,11 @@ export default function App() {
             <Route path="/" element={<TrainerDashboard />} />
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercises/new" element={<ExerciseForm />} />
+            <Route path="/exercises/new-wand" element={<WandExerciseForm />} />
             <Route path="/exercises/:id" element={<ExerciseDetail />} />
             <Route path="/exercises/:id/edit" element={<ExerciseForm />} />
+            <Route path="/exercises/:id/edit-wand" element={<WandExerciseForm />} />
+            <Route path="/exercises/:id/record-wand-template" element={<RecordWandTemplate />} />
             <Route path="/programs" element={<Programs />} />
             <Route path="/programs/new" element={<ProgramForm />} />
             <Route path="/programs/:id" element={<TrainerProgramDetail />} />
